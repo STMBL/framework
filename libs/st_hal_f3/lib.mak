@@ -69,6 +69,7 @@ ifneq (,$(findstring STM32F3, $(CPU)))
     ifneq (,$(findstring USB, $(PERIPH)))
       LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/src/stm32f3xx_hal_pcd.c
       LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/src/stm32f3xx_hal_pcd_ex.c
+      LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/src/stm32f3xx_ll_usb.c
     endif
 
     ifneq (,$(findstring SPI, $(PERIPH)))
