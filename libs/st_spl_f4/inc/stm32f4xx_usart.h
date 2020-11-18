@@ -2,14 +2,14 @@
   ******************************************************************************
   * @file    stm32f4xx_usart.h
   * @author  MCD Application Team
-  * @version V1.6.0
-  * @date    10-July-2015
+  * @version V1.8.0
+  * @date    04-November-2016
   * @brief   This file contains all the functions prototypes for the USART 
   *          firmware library.    
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT 2015 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2016 STMicroelectronics</center></h2>
   *
   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
   * You may not use this file except in compliance with the License.
@@ -114,7 +114,9 @@ typedef struct
                                      ((PERIPH) == UART5)  || \
                                      ((PERIPH) == USART6) || \
                                      ((PERIPH) == UART7)  || \
-                                     ((PERIPH) == UART8))
+                                     ((PERIPH) == UART8)  || \
+                                     ((PERIPH) == UART9)  || \
+                                     ((PERIPH) == UART10)) 
 
 #define IS_USART_1236_PERIPH(PERIPH) (((PERIPH) == USART1) || \
                                       ((PERIPH) == USART2) || \

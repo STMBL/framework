@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f4xx_lptim.c
   * @author  MCD Application Team
-  * @version V1.6.0
-  * @date    10-July-2015
+  * @version V1.8.0
+  * @date    04-November-2016
   * @brief   This file provides firmware functions to manage the following
   *          functionalities of the Low Power Timer (LPT) peripheral:
   *           + Initialization functions.
@@ -75,7 +75,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT 2015 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2016 STMicroelectronics</center></h2>
   *
   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
   * You may not use this file except in compliance with the License.
@@ -104,7 +104,7 @@
   * @brief LPTIM driver modules
   * @{
   */
-#if defined(STM32F410xx)
+#if defined(STM32F410xx) || defined(STM32F413_423xx)
 /* External variables --------------------------------------------------------*/
 /* Private typedef -----------------------------------------------------------*/
 /* Private defines -----------------------------------------------------------*/
@@ -515,7 +515,7 @@ void LPTIM_SelectOperatingMode(LPTIM_TypeDef* LPTIMx, uint32_t LPTIM_Mode)
     /* Set the CNTSTRT to select the continuous start*/
     LPTIMx->CR |= LPTIM_Mode_Continuous;
   }
-  else if(LPTIM_Mode == LPTIM_Mode_Single)
+  else /*LPTIM_Mode_Single */
   {
     /* Set the SNGSTRT to select the continuous start*/
     LPTIMx->CR |= LPTIM_Mode_Single;
@@ -937,7 +937,7 @@ ITStatus LPTIM_GetITStatus(LPTIM_TypeDef* LPTIMx, uint32_t LPTIM_IT)
 /**
   * @}
   */
-#endif /* STM32F410xx */
+#endif /* STM32F410xx || STM32F413_423xx */
 
 /**
   * @}
