@@ -65,5 +65,15 @@ ifneq (,$(findstring STM32F3, $(CPU)))
     ifneq (,$(findstring DMA, $(PERIPH)))
       LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/src/stm32f3xx_hal_dma.c
     endif
+
+    ifneq (,$(findstring USB, $(PERIPH)))
+      LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/src/stm32f3xx_hal_pcd.c
+      LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/src/stm32f3xx_hal_pcd_ex.c
+    endif
+
+    ifneq (,$(findstring SPI, $(PERIPH)))
+      LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/src/stm32f3xx_hal_spi.c
+      LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/src/stm32f3xx_hal_spi_ex.c
+    endif
   endif
 endif

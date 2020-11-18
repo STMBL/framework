@@ -1,0 +1,79 @@
+*.i
+*.o
+*.a
+*.elf
+*.hex
+*.bin
+*.dfu
+*.map
+*.log
+#*.net
+*.raw
+*.swp
+.DS_Store
+.depend
+*.list
+*.out
+*.pyc
+*.jdebug
+*.jdebug.user
+
+.vscode/*
+
+tools/pycrc*
+tools/__pycache__/
+
+sim/sim
+sim/plot
+stmblx
+*.ngc
+
+# Ignore list for Eagle, a PCB layout tool
+
+# Backup files
+*.s#?
+*.b#?
+*.l#?
+*.lck
+
+# kicad bak files
+hw/kicad/*.bak
+hw/kicad/*/*.bak
+hw/kicad/*/*/*.bak
+hw/kicad/*/*-bak
+
+# Eagle project file
+# It contains a serial number and references to the file structure
+# on your computer.
+# comment the following line if you want to have your project file included.
+eagle.epf
+
+# CAM files
+*.$$$
+*.cmp
+*.ly2
+*.l15
+*.sol
+*.plc
+*.stc
+*.sts
+*.crc
+*.crs
+
+*.dri
+*.drl
+*.gpi
+*.pls
+
+*.drd
+*.drd.*
+
+*.info
+
+*.eps
+obj_*
+conf_templates.c
+commandslist.h
+hal_tbl.c
+toolchain-user.mak
+build/
