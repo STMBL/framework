@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file    usbd_msc_data.h
+  * @file    usbd_msc_storage.h
   * @author  MCD Application Team
-  * @brief   Header for the usbd_msc_data.c file
+  * @brief   Header file for the usbd_msc_storage.c file
   ******************************************************************************
   * @attention
   *
@@ -18,40 +18,26 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USBD_MSC_DATA_H
-#define __USBD_MSC_DATA_H
+#ifndef __USBD_MSC_STORAGE_H
+#define __USBD_MSC_STORAGE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "usbd_conf.h"
+#include "usbd_msc.h"
 
 /** @addtogroup STM32_USB_DEVICE_LIBRARY
   * @{
   */
 
-/** @defgroup USB_INFO
-  * @brief general defines for the usb device library file
+/** @defgroup USBD_STORAGE
+  * @brief header file for the usbd_msc_storage.c file
   * @{
   */
 
-/** @defgroup USB_INFO_Exported_Defines
-  * @{
-  */
-#define MODE_SENSE6_LEN                    0x17U
-#define MODE_SENSE10_LEN                   0x1BU
-#define LENGTH_INQUIRY_PAGE00              0x06U
-#define LENGTH_INQUIRY_PAGE80              0x08U
-#define LENGTH_FORMAT_CAPACITIES           0x14U
-
-/**
-  * @}
-  */
-
-
-/** @defgroup USBD_INFO_Exported_TypesDefinitions
+/** @defgroup USBD_STORAGE_Exported_Defines
   * @{
   */
 /**
@@ -59,8 +45,18 @@ extern "C" {
   */
 
 
+/** @defgroup USBD_STORAGE_Exported_Types
+  * @{
+  */
 
-/** @defgroup USBD_INFO_Exported_Macros
+
+/**
+  * @}
+  */
+
+
+
+/** @defgroup USBD_STORAGE_Exported_Macros
   * @{
   */
 
@@ -68,21 +64,18 @@ extern "C" {
   * @}
   */
 
-/** @defgroup USBD_INFO_Exported_Variables
+/** @defgroup USBD_STORAGE_Exported_Variables
   * @{
   */
-extern uint8_t MSC_Page00_Inquiry_Data[LENGTH_INQUIRY_PAGE00];
-extern uint8_t MSC_Page80_Inquiry_Data[LENGTH_INQUIRY_PAGE80];
-extern uint8_t MSC_Mode_Sense6_data[MODE_SENSE6_LEN];
-extern uint8_t MSC_Mode_Sense10_data[MODE_SENSE10_LEN];
-
+extern USBD_StorageTypeDef  USBD_MSC_Template_fops;
 /**
   * @}
   */
 
-/** @defgroup USBD_INFO_Exported_FunctionsPrototype
+/** @defgroup USBD_STORAGE_Exported_FunctionsPrototype
   * @{
   */
+
 
 /**
   * @}
@@ -92,7 +85,7 @@ extern uint8_t MSC_Mode_Sense10_data[MODE_SENSE10_LEN];
 }
 #endif
 
-#endif /* __USBD_MSC_DATA_H */
+#endif /* __USBD_MSC_STORAGE_H */
 
 /**
   * @}
@@ -101,5 +94,4 @@ extern uint8_t MSC_Mode_Sense10_data[MODE_SENSE10_LEN];
 /**
 * @}
 */
-
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file    usbd_msc_data.h
+  * @file    usbd_template_core.h
   * @author  MCD Application Team
-  * @brief   Header for the usbd_msc_data.c file
+  * @brief   Header file for the usbd_template_core.c file.
   ******************************************************************************
   * @attention
   *
@@ -18,49 +18,40 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USBD_MSC_DATA_H
-#define __USBD_MSC_DATA_H
+#ifndef __USB_TEMPLATE_CORE_H
+#define __USB_TEMPLATE_CORE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "usbd_conf.h"
+#include  "usbd_ioreq.h"
 
 /** @addtogroup STM32_USB_DEVICE_LIBRARY
   * @{
   */
 
-/** @defgroup USB_INFO
-  * @brief general defines for the usb device library file
+/** @defgroup USBD_TEMPLATE
+  * @brief This file is the header file for usbd_template_core.c
   * @{
   */
 
-/** @defgroup USB_INFO_Exported_Defines
+
+/** @defgroup USBD_TEMPLATE_Exported_Defines
   * @{
   */
-#define MODE_SENSE6_LEN                    0x17U
-#define MODE_SENSE10_LEN                   0x1BU
-#define LENGTH_INQUIRY_PAGE00              0x06U
-#define LENGTH_INQUIRY_PAGE80              0x08U
-#define LENGTH_FORMAT_CAPACITIES           0x14U
+#define TEMPLATE_EPIN_ADDR                 0x81U
+#define TEMPLATE_EPIN_SIZE                 0x10U
+
+#define USB_TEMPLATE_CONFIG_DESC_SIZ       64U
 
 /**
   * @}
   */
 
 
-/** @defgroup USBD_INFO_Exported_TypesDefinitions
-  * @{
-  */
-/**
-  * @}
-  */
-
-
-
-/** @defgroup USBD_INFO_Exported_Macros
+/** @defgroup USBD_CORE_Exported_TypesDefinitions
   * @{
   */
 
@@ -68,22 +59,28 @@ extern "C" {
   * @}
   */
 
-/** @defgroup USBD_INFO_Exported_Variables
+
+
+/** @defgroup USBD_CORE_Exported_Macros
   * @{
   */
-extern uint8_t MSC_Page00_Inquiry_Data[LENGTH_INQUIRY_PAGE00];
-extern uint8_t MSC_Page80_Inquiry_Data[LENGTH_INQUIRY_PAGE80];
-extern uint8_t MSC_Mode_Sense6_data[MODE_SENSE6_LEN];
-extern uint8_t MSC_Mode_Sense10_data[MODE_SENSE10_LEN];
 
 /**
   * @}
   */
 
-/** @defgroup USBD_INFO_Exported_FunctionsPrototype
+/** @defgroup USBD_CORE_Exported_Variables
   * @{
   */
 
+extern USBD_ClassTypeDef USBD_TEMPLATE_ClassDriver;
+/**
+  * @}
+  */
+
+/** @defgroup USB_CORE_Exported_Functions
+  * @{
+  */
 /**
   * @}
   */
@@ -92,14 +89,13 @@ extern uint8_t MSC_Mode_Sense10_data[MODE_SENSE10_LEN];
 }
 #endif
 
-#endif /* __USBD_MSC_DATA_H */
-
+#endif  /* __USB_TEMPLATE_CORE_H */
 /**
   * @}
   */
 
 /**
-* @}
-*/
+  * @}
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

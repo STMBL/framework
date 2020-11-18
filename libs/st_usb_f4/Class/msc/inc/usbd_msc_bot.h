@@ -2,85 +2,82 @@
   ******************************************************************************
   * @file    usbd_msc_bot.h
   * @author  MCD Application Team
-  * @version V1.2.0
-  * @date    09-November-2015
-  * @brief   header for the usbd_msc_bot.c file
+  * @brief   Header for the usbd_msc_bot.c file
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT 2015 STMicroelectronics</center></h2>
+  * <h2><center>&copy; Copyright (c) 2015 STMicroelectronics.
+  * All rights reserved.</center></h2>
   *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
-  *
-  *        http://www.st.com/software_license_agreement_liberty_v2
-  *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
+  * This software component is licensed by ST under Ultimate Liberty license
+  * SLA0044, the "License"; You may not use this file except in compliance with
+  * the License. You may obtain a copy of the License at:
+  *                      www.st.com/SLA0044
   *
   ******************************************************************************
   */
-
-/* Define to prevent recursive inclusion -------------------------------------*/
-
-#include "usbd_core.h"
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USBD_MSC_BOT_H
 #define __USBD_MSC_BOT_H
 
-/** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Includes ------------------------------------------------------------------*/
+#include "usbd_core.h"
+
+/** @addtogroup STM32_USB_DEVICE_LIBRARY
   * @{
   */
-  
+
 /** @defgroup MSC_BOT
-  * @brief This file is the Header file for usbd_bot.c
+  * @brief This file is the Header file for usbd_msc_bot.c
   * @{
-  */ 
+  */
 
 
 /** @defgroup USBD_CORE_Exported_Defines
   * @{
-  */ 
-#define BOT_IDLE                      0       /* Idle state */
-#define BOT_DATA_OUT                  1       /* Data Out state */
-#define BOT_DATA_IN                   2       /* Data In state */
-#define BOT_LAST_DATA_IN              3       /* Last Data In Last */
-#define BOT_SEND_DATA                 4       /* Send Immediate data */
+  */
+#define USBD_BOT_IDLE                      0U       /* Idle state */
+#define USBD_BOT_DATA_OUT                  1U       /* Data Out state */
+#define USBD_BOT_DATA_IN                   2U       /* Data In state */
+#define USBD_BOT_LAST_DATA_IN              3U       /* Last Data In Last */
+#define USBD_BOT_SEND_DATA                 4U       /* Send Immediate data */
+#define USBD_BOT_NO_DATA                   5U       /* No data Stage */
 
-#define BOT_CBW_SIGNATURE             0x43425355
-#define BOT_CSW_SIGNATURE             0x53425355
-#define BOT_CBW_LENGTH                31
-#define BOT_CSW_LENGTH                13
+#define USBD_BOT_CBW_SIGNATURE             0x43425355U
+#define USBD_BOT_CSW_SIGNATURE             0x53425355U
+#define USBD_BOT_CBW_LENGTH                31U
+#define USBD_BOT_CSW_LENGTH                13U
+#define USBD_BOT_MAX_DATA                  256U
 
 /* CSW Status Definitions */
-#define CSW_CMD_PASSED                0x00
-#define CSW_CMD_FAILED                0x01
-#define CSW_PHASE_ERROR               0x02
+#define USBD_CSW_CMD_PASSED                0x00U
+#define USBD_CSW_CMD_FAILED                0x01U
+#define USBD_CSW_PHASE_ERROR               0x02U
 
 /* BOT Status */
-#define BOT_STATE_NORMAL              0
-#define BOT_STATE_RECOVERY            1
-#define BOT_STATE_ERROR               2
+#define USBD_BOT_STATUS_NORMAL             0U
+#define USBD_BOT_STATUS_RECOVERY           1U
+#define USBD_BOT_STATUS_ERROR              2U
 
 
-#define DIR_IN                        0
-#define DIR_OUT                       1
-#define BOTH_DIR                      2
+#define USBD_DIR_IN                        0U
+#define USBD_DIR_OUT                       1U
+#define USBD_BOTH_DIR                      2U
 
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup MSC_CORE_Private_TypesDefinitions
   * @{
-  */ 
+  */
 
-typedef struct _MSC_BOT_CBW
+typedef struct
 {
   uint32_t dSignature;
   uint32_t dTag;
@@ -89,65 +86,65 @@ typedef struct _MSC_BOT_CBW
   uint8_t  bLUN;
   uint8_t  bCBLength;
   uint8_t  CB[16];
+  uint8_t  ReservedForAlign;
 }
-MSC_BOT_CBW_TypeDef;
+USBD_MSC_BOT_CBWTypeDef;
 
 
-typedef struct _MSC_BOT_CSW
+typedef struct
 {
   uint32_t dSignature;
   uint32_t dTag;
   uint32_t dDataResidue;
   uint8_t  bStatus;
+  uint8_t  ReservedForAlign[3];
 }
-MSC_BOT_CSW_TypeDef;
+USBD_MSC_BOT_CSWTypeDef;
 
 /**
   * @}
-  */ 
+  */
 
 
 /** @defgroup USBD_CORE_Exported_Types
   * @{
   */
 
-extern uint8_t              MSC_BOT_Data[];
-extern uint16_t             MSC_BOT_DataLen;
-extern uint8_t              MSC_BOT_State;
-extern uint8_t              MSC_BOT_BurstMode;
-extern MSC_BOT_CBW_TypeDef  MSC_BOT_cbw;
-extern MSC_BOT_CSW_TypeDef  MSC_BOT_csw;
 /**
   * @}
-  */ 
+  */
 /** @defgroup USBD_CORE_Exported_FunctionsPrototypes
   * @{
-  */ 
-void MSC_BOT_Init (USB_OTG_CORE_HANDLE  *pdev);
-void MSC_BOT_Reset (USB_OTG_CORE_HANDLE  *pdev);
-void MSC_BOT_DeInit (USB_OTG_CORE_HANDLE  *pdev);
-void MSC_BOT_DataIn (USB_OTG_CORE_HANDLE  *pdev, 
+  */
+void MSC_BOT_Init(USBD_HandleTypeDef  *pdev);
+void MSC_BOT_Reset(USBD_HandleTypeDef  *pdev);
+void MSC_BOT_DeInit(USBD_HandleTypeDef  *pdev);
+void MSC_BOT_DataIn(USBD_HandleTypeDef  *pdev,
+                    uint8_t epnum);
+
+void MSC_BOT_DataOut(USBD_HandleTypeDef  *pdev,
                      uint8_t epnum);
 
-void MSC_BOT_DataOut (USB_OTG_CORE_HANDLE  *pdev, 
-                      uint8_t epnum);
+void MSC_BOT_SendCSW(USBD_HandleTypeDef  *pdev,
+                     uint8_t CSW_Status);
 
-void MSC_BOT_SendCSW (USB_OTG_CORE_HANDLE  *pdev,
-                             uint8_t CSW_Status);
-
-void  MSC_BOT_CplClrFeature (USB_OTG_CORE_HANDLE  *pdev, 
-                             uint8_t epnum);
+void  MSC_BOT_CplClrFeature(USBD_HandleTypeDef  *pdev,
+                            uint8_t epnum);
 /**
   * @}
-  */ 
+  */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __USBD_MSC_BOT_H */
 /**
   * @}
-  */ 
+  */
 
 /**
 * @}
-*/ 
+*/
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 
