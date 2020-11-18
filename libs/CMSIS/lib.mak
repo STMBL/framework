@@ -13,6 +13,7 @@ ifneq (,$(findstring CMSIS, $(LIBS)))
 
     # peripheral include
     INCDIRS := $(INCDIRS) $(LIBPATH)/Device/ST/STM32F3xx/Include
+    INCDIRS := $(INCDIRS) $(LIBPATH)/Include
 
     LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/Device/ST/STM32F3xx/Source/Templates/system_stm32f3xx.c
     LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/Device/ST/STM32F3xx/Source/Templates/gcc/startup_stm32f303xc.s
