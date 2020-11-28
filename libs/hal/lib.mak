@@ -1,4 +1,4 @@
-ifneq (,$(findstring HAL, $(LIBS)))
+ifneq (,$(findstring HAL, $(filter-out ST_HAL, $(LIBS))))
 # lib path
   LIBPATH = $(FRAMEWORK_DIR)/libs/hal
   $(info using LIB: $(LIBPATH))
