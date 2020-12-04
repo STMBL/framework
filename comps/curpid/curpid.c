@@ -135,12 +135,9 @@ static void rt_func(float period, void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
   float ud = LIMIT(ff * r * idc - kind * indd + kpd * id_error, max_volt);
   float uq = LIMIT(ff * r * iqc + kind * indq + kpq * iq_error, max_volt);
 
-  if(kpd * kid > 0.0 && kpq * kiq > 0.0) {
+  if(kpd * kid > 0.0 && kpq * kiq > 0.0 && PIN(en) > 0.0) {
     ctx->id_error_sum = LIMIT(ctx->id_error_sum + kpd * kid * id_error * period, max_volt - ud);
     ctx->iq_error_sum = LIMIT(ctx->iq_error_sum + kpq * kiq * iq_error * period, max_volt - uq);
-  } else {
-    ctx->id_error_sum = 0.0;
-    ctx->iq_error_sum = 0.0;
   }
 
   ud += ctx->id_error_sum;
@@ -158,6 +155,9 @@ static void rt_func(float period, void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
   if(PIN(en) <= 0.0) {
     ud                = 0.0;
     uq                = 0.0;
+  }
+
+  if(PIN(en) == 0.0){
     ctx->id_error_sum = 0.0;
     ctx->iq_error_sum = 0.0;
   }
