@@ -10,11 +10,11 @@ HAL_COMP(spid);
 // input
 HAL_PIN(cmd);  // command
 HAL_PIN(fb);   // feedback
-HAL_PIN(en);   // enalbe
+HAL_PIN(en);   // enable
 
 // gains
 HAL_PIN(kp);      // proportional
-HAL_PIN(ki);      // integator
+HAL_PIN(ki);      // integrator
 HAL_PIN(kd);      // differential
 HAL_PIN(ksd);     // scaled differential
 HAL_PIN(kdi);     // differential integrator

@@ -58,6 +58,7 @@ HAL_PIN(kci);
 HAL_PIN(flp);
 HAL_PIN(kfp);
 HAL_PIN(flux);
+HAL_PIN(fki);
 HAL_PIN(ea);
 HAL_PIN(eb);
 HAL_PIN(fa);
@@ -88,8 +89,8 @@ static void nrt_init(void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
   PIN(ld)  = 0.00006;
   PIN(lq)  = 0.00006;
   PIN(psi) = 0.05;
-  PIN(kp)  = 0.1;
-  PIN(ki)  = 0.005;
+  PIN(kp)  = 0.5;
+  PIN(ki)  = 500.0;
   PIN(kci)  = 500.0;
   PIN(ksp)  = 1.0;
   PIN(scale) = 1.0;
@@ -97,6 +98,7 @@ static void nrt_init(void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
   PIN(flp) = 0.99;
   PIN(min_flux) = 0.005;
   PIN(kfp) = 0.01;
+  PIN(fki) = 1.0;
 }
 
 static void rt_func(float period, void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
@@ -146,8 +148,15 @@ static void rt_func(float period, void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
 
   PIN(flux) = sqrtf(PIN(fa) * PIN(fa) + PIN(fb) * PIN(fb));
 
+  sincos_fast(PIN(pos_out), &PIN(sin), &PIN(cos));
+
   if(PIN(flux) >= PIN(min_flux)){
-    PIN(pos_out)  = atan2f(PIN(fb), PIN(fa));
+    //float err = PIN(fb) * PIN(cos) - PIN(fa) * PIN(sin);
+    //PIN(vel) += PIN(fki) * err * period;
+    // PIN(pos_out) = mod(PIN(pos_out) + PIN(vel) * period);
+    float pos = atan2f(PIN(fb), PIN(fa));
+    PIN(vel) = minus(pos, PIN(pos_out)) / period;
+    PIN(pos_out) = pos;
   }
 
   float pos_error = minus(PIN(pos_in), PIN(pos_out));
@@ -155,7 +164,6 @@ static void rt_func(float period, void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
 
   
   //park transformation
-  sincos_fast(PIN(pos_out), &PIN(sin), &PIN(sin));
   PIN(id) = PIN(ia) * PIN(cos) + PIN(ib) * PIN(sin);
   PIN(iq) = -PIN(ia) * PIN(sin) + PIN(ib) * PIN(cos);
 
