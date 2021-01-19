@@ -14,8 +14,8 @@ HAL_PIN(cmd_mode); // volt, current
 HAL_PIN(mode); // dq transformation
 
 // current command
-HAL_PIN(id_cmd);
-HAL_PIN(iq_cmd);
+HAL_PIN(d_cmd);
+HAL_PIN(q_cmd);
 
 // current feedback
 HAL_PIN(iu);
@@ -56,20 +56,22 @@ HAL_PIN(kci);
 
 // flux gains
 HAL_PIN(flp);
-HAL_PIN(kfp);
 HAL_PIN(flux);
-HAL_PIN(fki);
+HAL_PIN(fkp);
 HAL_PIN(ea);
 HAL_PIN(eb);
 HAL_PIN(fa);
 HAL_PIN(fb);
-HAL_PIN(min_flux);
 
 HAL_PIN(scale);
 
+// observer
 HAL_PIN(pos_in);  // position input
 HAL_PIN(pos_out);  // position output
-HAL_PIN(vel);  // velocity input
+HAL_PIN(vel_out);  // velocity output
+// sat, observer stable out, 
+HAL_PIN(com_pos);  // commutation position input
+HAL_PIN(vel_in);  // velocity input
 
 // current error outputs
 HAL_PIN(id_error);
@@ -88,7 +90,7 @@ static void nrt_init(void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
   PIN(r)  = 0.05;
   PIN(ld)  = 0.00006;
   PIN(lq)  = 0.00006;
-  PIN(psi) = 0.05;
+  PIN(psi) = 0.005;
   PIN(kp)  = 0.5;
   PIN(ki)  = 500.0;
   PIN(kci)  = 500.0;
@@ -96,9 +98,7 @@ static void nrt_init(void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
   PIN(scale) = 1.0;
 
   PIN(flp) = 0.99;
-  PIN(min_flux) = 0.005;
-  PIN(kfp) = 0.01;
-  PIN(fki) = 1.0;
+  PIN(fkp) = 1000.0;
 }
 
 static void rt_func(float period, void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
@@ -148,22 +148,19 @@ static void rt_func(float period, void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
 
   PIN(flux) = sqrtf(PIN(fa) * PIN(fa) + PIN(fb) * PIN(fb));
 
-  sincos_fast(PIN(pos_out), &PIN(sin), &PIN(cos));
-
-  if(PIN(flux) >= PIN(min_flux)){
-    //float err = PIN(fb) * PIN(cos) - PIN(fa) * PIN(sin);
-    //PIN(vel) += PIN(fki) * err * period;
-    // PIN(pos_out) = mod(PIN(pos_out) + PIN(vel) * period);
-    float pos = atan2f(PIN(fb), PIN(fa));
-    PIN(vel) = minus(pos, PIN(pos_out)) / period;
-    PIN(pos_out) = pos;
+  // pos pll
+  float pos = PIN(pos_in);
+  if(PIN(flux) >= PIN(psi) / 2.0){
+    pos = atan2f(PIN(fb), PIN(fa));
   }
 
-  float pos_error = minus(PIN(pos_in), PIN(pos_out));
-  PIN(pos_out) = mod(PIN(pos_out) + pos_error * PIN(kfp) * period);
+  PIN(pos_out) = mod(PIN(pos_out) + PIN(vel_out) * period);
+  float pos_error = minus(pos, PIN(pos_out));
+  PIN(pos_out) = mod(PIN(pos_out) + pos_error * PIN(fkp) * 2.0 * period);
+  PIN(vel_out) += pos_error * PIN(fkp) * PIN(fkp) * period;
 
-  
   //park transformation
+  sincos_fast(PIN(com_pos), &PIN(sin), &PIN(cos));
   PIN(id) = PIN(ia) * PIN(cos) + PIN(ib) * PIN(sin);
   PIN(iq) = -PIN(ia) * PIN(sin) + PIN(ib) * PIN(cos);
 
@@ -173,22 +170,22 @@ static void rt_func(float period, void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
   float kpq  = PIN(lq) * PIN(kp) / period / 2.0;
   float kiq  = PIN(r) * PIN(ki);
 
-  float idc     = PIN(id_cmd);
-  float iqc     = PIN(iq_cmd);
+  float idc     = PIN(d_cmd);
+  float iqc     = PIN(q_cmd);
 
   float abscur;
   float absvolt;
 
   if(PIN(cmd_mode) == VOLT_MODE) {
     absvolt = idc * idc + iqc * iqc; // clamp cmd
-    PIN(scale) *= sqrtf(CLAMP(PIN(max_volt) * PIN(max_volt) / MAX(absvolt, PIN(max_volt) * 0.1), 0.0, 1.0));
+    PIN(scale) *= sqrtf(CLAMP(PIN(max_volt) * PIN(max_volt) / MAX(absvolt, 0.001), 0.0, 1.0));
 
     abscur = PIN(id) * PIN(id) + PIN(iq) * PIN(iq); // clamp over fb
     PIN(scale) += (PIN(max_cur) * PIN(max_cur) - abscur) * PIN(kci) * period;
   }
   else{
     abscur = idc * idc + iqc * iqc; // clamp cmd
-    PIN(scale) = sqrtf(PIN(max_cur) * PIN(max_cur) / MAX(abscur, PIN(max_cur) * 0.1));
+    PIN(scale) = sqrtf(PIN(max_cur) * PIN(max_cur) / MAX(abscur, 0.001));
   }
   PIN(scale) = CLAMP(PIN(scale), 0.0, 1.0);
   
@@ -197,8 +194,8 @@ static void rt_func(float period, void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
 
   float psi_d = PIN(ld) * PIN(id) + PIN(psi);
   float psi_q = PIN(lq) * PIN(iq);
-  float indd  = PIN(vel) * psi_q;
-  float indq  = PIN(vel) * psi_d;
+  float indd  = PIN(vel_in) * psi_q;
+  float indq  = PIN(vel_in) * psi_d;
 
   // predictor to cancel pwm delay
   // id += (PIN(ud) - r * id + indd) / ld * period * PIN(ksp);
