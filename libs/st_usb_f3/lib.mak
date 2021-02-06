@@ -1,4 +1,4 @@
-ifneq (,$(findstring STM32F3, $(CPU)))
+ifneq (,$(findstring STM32F3, $(CPUDEF)))
   ifneq (,$(findstring ST_USB, $(LIBS)))
     # lib path
     LIBPATH = $(FRAMEWORK_DIR)/libs/st_usb_f3
