@@ -77,3 +77,4 @@ commandslist.h
 hal_tbl.c
 toolchain-user.mak
 build/
+openocd.log
