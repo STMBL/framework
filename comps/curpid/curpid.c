@@ -62,6 +62,7 @@ HAL_PIN(ea);
 HAL_PIN(eb);
 HAL_PIN(fa);
 HAL_PIN(fb);
+HAL_PIN(min_vel);
 
 HAL_PIN(scale);
 
@@ -82,6 +83,9 @@ HAL_PIN(iq_error_sum);
 
 HAL_PIN(sin);
 HAL_PIN(cos);
+
+HAL_PIN(conv);
+HAL_PIN(obs_pos_err);
 
 static void nrt_init(void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
   // struct curpid_ctx_t * ctx = (struct curpid_ctx_t *)ctx_ptr;
@@ -150,12 +154,21 @@ static void rt_func(float period, void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
 
   // pos pll
   float pos = PIN(pos_in);
-  if(PIN(flux) >= PIN(psi) / 2.0){
+  PIN(conv) = CLAMP(PIN(flux) / (PIN(psi) * 0.9), 0.0, 1.0);
+  PIN(conv) *= CLAMP(ABS(PIN(vel_out)) / PIN(min_vel), 0.0, 1.0);
+
+  if(PIN(flux) >= PIN(psi) / 3.0 * 2.0){
+  //if(ABS(PIN(vel_out)) > PIN(min_vel)){
     pos = atan2f(PIN(fb), PIN(fa));
+  //}
   }
 
+  PIN(obs_pos_err) = minus(pos, PIN(pos_in));
+
   PIN(pos_out) = mod(PIN(pos_out) + PIN(vel_out) * period);
-  float pos_error = minus(pos, PIN(pos_out));
+  float pos_in_error = minus(PIN(pos_in), PIN(pos_out));
+  float pos_obs_error = minus(pos, PIN(pos_out));
+  float pos_error = PIN(conv) * pos_obs_error + (1.0 - PIN(conv)) * pos_in_error;
   PIN(pos_out) = mod(PIN(pos_out) + pos_error * PIN(fkp) * 2.0 * period);
   PIN(vel_out) += pos_error * PIN(fkp) * PIN(fkp) * period;
 
@@ -165,13 +178,13 @@ static void rt_func(float period, void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
   PIN(iq) = -PIN(ia) * PIN(sin) + PIN(ib) * PIN(cos);
 
   // curpid
-  float kpd  = PIN(ld) * PIN(kp) / period / 2.0;
-  float kid  = PIN(r) * PIN(ki);
-  float kpq  = PIN(lq) * PIN(kp) / period / 2.0;
-  float kiq  = PIN(r) * PIN(ki);
+  float kpd = PIN(ld) * PIN(kp) / period / 2.0;
+  float kid = PIN(r) * PIN(ki);
+  float kpq = PIN(lq) * PIN(kp) / period / 2.0;
+  float kiq = PIN(r) * PIN(ki);
 
-  float idc     = PIN(d_cmd);
-  float iqc     = PIN(q_cmd);
+  float idc = PIN(d_cmd);
+  float iqc = PIN(q_cmd);
 
   float abscur;
   float absvolt;

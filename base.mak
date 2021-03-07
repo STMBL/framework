@@ -2,7 +2,6 @@
 #     0 = turn off optimization. s = optimize for size.
 #
 OPT ?= -O1
-# OPT = g         # for debugging
 
 # Target file name (without extension)
 TARGET = build/fw
@@ -141,16 +140,32 @@ Q     := @
 NULL     := 2>/dev/null
 endif
 
+GIT_HASH := $(shell git describe --always --dirty)
+GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+USR := $(shell whoami)
+HOST := $(shell hostname)
+CRC = $(shell crc32 $(basename $@).bin)
+BIN_SIZE = $(strip $(shell wc -c < $(basename $@).bin))
+CFLAGS += -DGIT_HASH=$(GIT_HASH)
+CFLAGS += -DGIT_BRANCH=$(GIT_BRANCH)
+CFLAGS += -DUSR=$(USR)
+CFLAGS += -DHOST=$(HOST)
+CFLAGS += -DBUILD_CC_VERSION=$(shell $(CC) -dumpversion)
+CFLAGS += -DBUILD_CC=$(CC)
+
 # Link: create ELF output file from object files
 #
-build/fw.elf: $(OBJECTS) $(LDSCRIPT)
+build/fw.elf: build/fw.tmp_pre
+	@echo Post-processing: $@
+	$(Q)$(OBJCOPY) -O binary --gap-fill 0xFF $< $(basename $@).bin
+	$(Q)$(CC) $(OBJECTS) $(LDFLAGS) -Xlinker --defsym=BIN_CRC=0 -Xlinker --defsym=BIN_SIZE=$(BIN_SIZE) --output $(basename $@).tmp
+	$(Q)$(CC) $(OBJECTS) $(LDFLAGS) -Xlinker --defsym=BIN_CRC=0x$(CRC) -Xlinker --defsym=BIN_SIZE=$(BIN_SIZE) --output $(basename $@).elf
+
+build/fw.tmp_pre: $(OBJECTS) $(LDSCRIPT)
 	@echo Linking: $@
 	@$(MKDIR) -p $(dir $@)
-	$(Q)$(CC) $(OBJECTS) $(LDFLAGS) --output $(basename $@).tmp
-
-	@echo Post-processing: $@
-	$(Q)$(POSTLD) $(basename $@).tmp $@
-
+	$(Q)$(CC) $(OBJECTS) $(LDFLAGS) -Xlinker --defsym=BIN_CRC=0 -Xlinker --defsym=BIN_SIZE=0 --output $(basename $@).tmp_pre
+	
 # Create extended listing file from ELF output file
 #
 build/fw.lss: build/fw.elf
@@ -243,7 +258,7 @@ flash: build/fw.bin
 
 # TODO: consolidate these two rules into a wildcard version?
 build/fw.dfu: $(FRAMEWORK_DIR)/tools/dfu-convert.py build/fw.bin
-	$(PYTHON) $(FRAMEWORK_DIR)/tools/dfu-convert.py -b 0x08000000:build/fw.bin build/fw.dfu
+	$(PYTHON) $(FRAMEWORK_DIR)/tools/dfu-convert.py -b $(ADDRESS):build/fw.bin build/fw.dfu
 
 include ../../framework/toolchain.mak
 -include ../../framework/toolchain-user.mak

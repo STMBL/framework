@@ -14,17 +14,18 @@ ifneq (,$(findstring CMSIS, $(LIBS)))
     LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/Device/ST/STM32F3xx/Source/Templates/gcc/startup_stm32f303xc.s
   endif
 
-  ifneq (,$(findstring STM32F4, $(CPUDEF))) 
-    # cpu define
-    ifneq (,$(findstring STM32F40, $(CPUDEF)))
-      CPUDEF = STM32F40_41xxx
-    endif
+  ifneq (,$(findstring STM32F405, $(CPUDEF))) 
+    # # cpu define
+    # ifneq (,$(findstring STM32F40, $(CPUDEF)))
+    #   CPUDEF = STM32F405xx
+    # endif
 
     # peripheral include
     INCDIRS := $(INCDIRS) $(LIBPATH)/Device/ST/STM32F4xx/Include
+    INCDIRS := $(INCDIRS) $(LIBPATH)/Include
 
-    #LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/Device/ST/STM32F4xx/Source/system_stm32f4xx.c
-    LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/Device/ST/STM32F4xx/Source/startup_stm32f40_41xxx.s
+    LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c
+    LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f405xx.s
   endif
 
   # check cpu define

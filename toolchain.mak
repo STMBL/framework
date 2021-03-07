@@ -6,6 +6,7 @@ DFU-SUFFIX = dfu-suffix
 ST-FLASH   = st-flash
 TOOLCHAIN  = arm-none-eabi-
 CC         = $(TOOLCHAIN)gcc
+LD         = $(TOOLCHAIN)ld
 OBJCOPY    = $(TOOLCHAIN)objcopy
 OBJDUMP    = $(TOOLCHAIN)objdump
 SIZE       = $(TOOLCHAIN)size
