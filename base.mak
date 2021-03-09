@@ -152,6 +152,9 @@ CFLAGS += -DUSR=$(USR)
 CFLAGS += -DHOST=$(HOST)
 CFLAGS += -DBUILD_CC_VERSION=$(shell $(CC) -dumpversion)
 CFLAGS += -DBUILD_CC=$(CC)
+ifdef XTAL_FREQ
+	CFLAGS += -DHSE_VALUE=$(XTAL_FREQ)
+endif
 
 # Link: create ELF output file from object files
 #
