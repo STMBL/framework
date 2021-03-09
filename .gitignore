@@ -78,3 +78,5 @@ hal_tbl.c
 toolchain-user.mak
 build/
 openocd.log
+.cortex-debug.registers.state.json
+.cortex-debug.peripherals.state.json
