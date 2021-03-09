@@ -35,7 +35,7 @@ static void nrt_init(void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
     PINA(gain, i) = 10;
   }
 }
-
+// TODO: remove cdc stuff
 static void rt_func(float period, void *ctx_ptr, hal_pin_inst_t *pin_ptr) {
   struct term_ctx_t *ctx      = (struct term_ctx_t *)ctx_ptr;
   struct term_pin_ctx_t *pins = (struct term_pin_ctx_t *)pin_ptr;
