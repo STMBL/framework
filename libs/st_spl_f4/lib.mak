@@ -1,4 +1,4 @@
-ifneq (,$(findstring STM32F4, $(CPU)))  
+ifneq (,$(findstring STM32F4, $(CPUDEF)))  
   ifneq (,$(findstring ST_SPL, $(LIBS)))
     # lib path
     LIBPATH = $(FRAMEWORK_DIR)/libs/st_spl_f4

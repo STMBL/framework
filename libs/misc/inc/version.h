@@ -3,23 +3,43 @@
 #include <stdint.h>
 
 typedef struct {
-  // set at link-time by add-version-info.py
-  uint32_t image_crc;
-  uint32_t image_size;
+  uint32_t crc;
+  uint32_t size;
+  // void* app;
+} bin_info_t;
 
+typedef struct {
   char git_version[32];
   char git_branch[32];
-  char build_user[16];
+  char build_user[32];
   char build_host[32];
   char build_date[16];
   char build_time[16];
 
-  // set at compile-time
-  //TODO: change to uint32_t
   char product_name[32];
-  int major;
-  int minor;
-  int patch;
-} version_info_t;
+  uint32_t major;
+  uint32_t minor;
+  uint32_t patch;
 
-extern volatile const version_info_t version_info;
+  char build_cc[32];
+  char cc_version[16];
+} fw_info_t;
+
+
+// typedef struct {
+
+//   fw_info_t* booloader;
+//   fw_info_t* app;
+
+//   void* hw_desc;
+//   uint32_t hw_desc_size;
+
+//   void* config;
+//   uint32_t config_size;
+
+//   void* other_apps;
+//   uint32_t other_apps_size;
+// } mem_info_t;
+
+
+// extern volatile const fw_info_t fw_info;

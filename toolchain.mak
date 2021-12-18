@@ -7,6 +7,7 @@ ST-FLASH   = st-flash
 TOOLCHAIN  = arm-none-eabi-
 CC         = $(TOOLCHAIN)gcc
 CXX        = $(TOOLCHAIN)g++
+LD         = $(TOOLCHAIN)ld
 OBJCOPY    = $(TOOLCHAIN)objcopy
 OBJDUMP    = $(TOOLCHAIN)objdump
 SIZE       = $(TOOLCHAIN)size
