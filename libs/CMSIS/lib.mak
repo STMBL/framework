@@ -5,6 +5,24 @@ ifneq (,$(findstring CMSIS, $(LIBS)))
 
   INCDIRS := $(INCDIRS) $(LIBPATH)/Include
 
+  ifneq (,$(findstring STM32F1, $(CPU))) 
+    # cpu define
+    ifneq (,$(findstring STM32F103xC, $(CPU)))
+      CPUDEF = STM32F103xE
+    endif
+
+    ifneq (,$(findstring STM32F103xE, $(CPU)))
+      CPUDEF = STM32F103xE
+    endif
+
+    # peripheral include
+    INCDIRS := $(INCDIRS) $(LIBPATH)/Device/ST/STM32F1xx/Include
+    INCDIRS := $(INCDIRS) $(LIBPATH)/Include
+
+    LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/Device/ST/STM32F1xx/Source/Templates/system_stm32f1xx.c
+    LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/Device/ST/STM32F1xx/Source/Templates/gcc/startup_stm32f103xe.s
+  endif
+  
   ifneq (,$(findstring STM32F3, $(CPU))) 
     # cpu define
     ifneq (,$(findstring STM32F303, $(CPU)))

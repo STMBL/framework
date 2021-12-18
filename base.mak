@@ -33,38 +33,43 @@ CPPFLAGS += $(addprefix -I,$(INCDIRS))
 CPPFLAGS += -fsingle-precision-constant
 # CPPFLAGS += -save-temps=obj
 
-#---------------- C Compiler Options ----------------
-#  -O*            optimization level
-#  -f...          tuning, see GCC documentation
-#  -Wall...       warning level
-#
-CFLAGS += $(OPT)
-CFLAGS += -std=gnu11
-CFLAGS += -ffunction-sections
-CFLAGS += -fdata-sections
-CFLAGS += -Wall
-CFLAGS += -Wmaybe-uninitialized
-CFLAGS += -Wuninitialized
-CFLAGS += -fno-builtin ## from old
-CFLAGS += -nostartfiles
-CFLAGS += -Wfatal-errors
-#CFLAGS += -Wstrict-prototypes
-#CFLAGS += -Wextra
-#CFLAGS += -Wpointer-arith
-#CFLAGS += -Winline
-#CFLAGS += -Wunreachable-code
-#CFLAGS += -Wundef
-
+#---------------- C/C++ Compiler Options ----------------
 # Use a friendly C dialect
 CPPFLAGS += -fno-strict-aliasing
 CPPFLAGS += -fwrapv
+CPPFLAGS += -ffunction-sections
+CPPFLAGS += -fdata-sections
+CPPFLAGS += -Wall
+CPPFLAGS += -Wmaybe-uninitialized
+CPPFLAGS += -Wuninitialized
+CPPFLAGS += -fno-builtin
+CPPFLAGS += -nostartfiles
+CPPFLAGS += -Wdouble-promotion
+CPPFLAGS += -Wundef
+CPPFLAGS += -fno-common
+CPPFLAGS += -fstack-usage
+CPPFLAGS += -Wpadded
+CPPFLAGS += -Wunreachable-code
+#CPPFLAGS += -Wextra
+
+#---------------- C Compiler Options ----------------
+#
+CFLAGS += $(OPT)
+CFLAGS += -std=gnu11
+#CFLAGS += -Wstrict-prototypes
+#CFLAGS += -Wpointer-arith
+#CFLAGS += -Winline
 
 #---------------- C++ Compiler Options ----------------
 #
 CXXFLAGS += $(OPT)
-CXXFLAGS += -ffunction-sections
-CXXFLAGS += -fdata-sections
-CXXFLAGS += -Wall
+CXXFLAGS += -std=c++20
+#CXXFLAGS += -lgcc
+CXXFLAGS += -nodefaultlibs
+CXXFLAGS += -nostdlib
+CXXFLAGS += -fno-rtti 
+CXXFLAGS += -fno-exceptions
+CXXFLAGS += -fno-builtin
 
 #---------------- Assembler Options ----------------
 #  -Wa,...    tell GCC to pass this to the assembler
@@ -195,6 +200,23 @@ build/%.o : src/%.c #$(GENINCS) $(GENSOURCES)
 	@echo Compiling C: $<
 	@$(MKDIR) -p $(dir $@)
 	$(Q)$(CC) -c $(CPPFLAGS) $(CFLAGS) $(GENDEPFLAGS) $< -o $@ 
+
+# Compile: create object files from C++ source files
+
+build/gen/%.o : build/gen/src/%.cpp #$(GENINCS) $(GENSOURCES)
+	@echo Compiling gen C++: $<
+	@$(MKDIR) -p $(dir $@)
+	$(Q)$(Cxx) -c $(CPPFLAGS) $(CXXFLAGS) $(GENDEPFLAGS) $< -o $@ 
+
+build/libs/%.o : ../../framework/libs/%.cpp #$(GENINCS) $(GENSOURCES)
+	@echo Compiling lib C++: $<
+	@$(MKDIR) -p $(dir $@)
+	$(Q)$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(GENDEPFLAGS) $< -o $@ 
+
+build/%.o : src/%.cpp #$(GENINCS) $(GENSOURCES)
+	@echo Compiling C++: $<
+	@$(MKDIR) -p $(dir $@)
+	$(Q)$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(GENDEPFLAGS) $< -o $@ 
 
 # build/%.o : %.cpp
 # 	@echo Compiling C++: $<
