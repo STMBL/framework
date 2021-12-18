@@ -5,7 +5,7 @@ ifneq (,$(findstring CMSIS, $(LIBS)))
 
   INCDIRS := $(INCDIRS) $(LIBPATH)/Include
 
-  ifneq (,$(findstring STM32F1, $(CPUDEF))) 
+  ifneq (,$(findstring STM32F1, $(CPUDEF)))
     # peripheral include
     INCDIRS := $(INCDIRS) $(LIBPATH)/Device/ST/STM32F1xx/Include
     INCDIRS := $(INCDIRS) $(LIBPATH)/Include

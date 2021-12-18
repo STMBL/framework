@@ -41,14 +41,16 @@ CPPFLAGS += -fdata-sections
 CPPFLAGS += -Wall
 CPPFLAGS += -Wmaybe-uninitialized
 CPPFLAGS += -Wuninitialized
-CPPFLAGS += -fno-builtin
-CPPFLAGS += -nostartfiles
 CPPFLAGS += -Wdouble-promotion
 CPPFLAGS += -Wundef
+CPPFLAGS += -nodefaultlibs
+CPPFLAGS += -nostdlib
 CPPFLAGS += -fno-common
-CPPFLAGS += -fstack-usage
-CPPFLAGS += -Wpadded
-CPPFLAGS += -Wunreachable-code
+CPPFLAGS += -fno-builtin
+CPPFLAGS += -nostartfiles
+#CPPFLAGS += -fstack-usage
+#CPPFLAGS += -Wpadded
+#CPPFLAGS += -Wunreachable-code
 #CPPFLAGS += -Wextra
 
 #---------------- C Compiler Options ----------------
@@ -63,12 +65,9 @@ CFLAGS += -std=gnu11
 #
 CXXFLAGS += $(OPT)
 CXXFLAGS += -std=c++20
-#CXXFLAGS += -lgcc
-CXXFLAGS += -nodefaultlibs
-CXXFLAGS += -nostdlib
 CXXFLAGS += -fno-rtti 
 CXXFLAGS += -fno-exceptions
-CXXFLAGS += -fno-builtin
+#CXXFLAGS += -lgcc
 
 #---------------- Assembler Options ----------------
 #  -Wa,...    tell GCC to pass this to the assembler
@@ -87,6 +86,7 @@ LDFLAGS += $(OPT)
 LDFLAGS += -lm
 LDFLAGS += -Wl,-Map=build/fw.map,--cref
 LDFLAGS += -Wl,--gc-sections
+LDFLAGS += -specs=nano.specs -specs=nosys.specs
 
 # LDFLAGS += -specs=nano.specs -u _printf_float -u _scanf_float
 # LDFLAGS += -lc -specs=nosys.specs
@@ -151,12 +151,12 @@ USR := $(shell whoami)
 HOST := $(shell hostname)
 CRC = $(shell crc32 $(basename $@).bin)
 BIN_SIZE = $(strip $(shell wc -c < $(basename $@).bin))
-CFLAGS += -DGIT_HASH=$(GIT_HASH)
-CFLAGS += -DGIT_BRANCH=$(GIT_BRANCH)
-CFLAGS += -DUSR=$(USR)
-CFLAGS += -DHOST=$(HOST)
-CFLAGS += -DBUILD_CC_VERSION=$(shell $(CC) -dumpversion)
-CFLAGS += -DBUILD_CC=$(CC)
+CPPFLAGS += -DGIT_HASH=$(GIT_HASH)
+CPPFLAGS += -DGIT_BRANCH=$(GIT_BRANCH)
+CPPFLAGS += -DUSR=$(USR)
+CPPFLAGS += -DHOST=$(HOST)
+CPPFLAGS += -DBUILD_CC_VERSION=$(shell $(CC) -dumpversion)
+CPPFLAGS += -DBUILD_CC=$(CC)
 ifdef XTAL_FREQ
 	CFLAGS += -DHSE_VALUE=$(XTAL_FREQ)
 endif
@@ -173,7 +173,7 @@ build/fw.tmp_pre: $(OBJECTS) $(LDSCRIPT)
 	@echo Linking: $@
 	@$(MKDIR) -p $(dir $@)
 	$(Q)$(CC) $(OBJECTS) $(LDFLAGS) -Xlinker --defsym=BIN_CRC=0 -Xlinker --defsym=BIN_SIZE=0 --output $(basename $@).tmp_pre
-	
+
 # Create extended listing file from ELF output file
 #
 build/fw.lss: build/fw.elf
