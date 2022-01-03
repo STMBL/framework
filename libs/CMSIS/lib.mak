@@ -11,7 +11,7 @@ ifneq (,$(findstring CMSIS, $(LIBS)))
     INCDIRS := $(INCDIRS) $(LIBPATH)/Include
 
     LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/Device/ST/STM32F1xx/Source/Templates/system_stm32f1xx.c
-    LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/Device/ST/STM32F1xx/Source/Templates/gcc/startup_stm32f103xe.s
+    LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/Device/ST/STM32F1xx/Source/Templates/gcc/startup_stm32f103xb.s
   endif
 
   ifneq (,$(findstring STM32F3, $(CPUDEF))) 

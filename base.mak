@@ -67,6 +67,7 @@ CXXFLAGS += $(OPT)
 CXXFLAGS += -std=c++20
 CXXFLAGS += -fno-rtti 
 CXXFLAGS += -fno-exceptions
+CXXFLAGS += -Wno-volatile # allow volatile reg |= bits;
 #CXXFLAGS += -lgcc
 
 #---------------- Assembler Options ----------------
