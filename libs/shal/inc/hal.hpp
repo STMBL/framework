@@ -5,6 +5,8 @@
 
 class hal_comp{
   public:
+    uint32_t min_time;
+    uint32_t max_time;
     virtual void rt_func(hal_ctx_t* ctx, uint32_t hal_slot){}
     virtual void init(hal_ctx_t* ctx){}
 };
@@ -14,13 +16,34 @@ class hal_t{
   public:
     hal_ctx_t* ctx;
     uint64_t hal_ticks;
+    uint32_t start_time;
+    uint32_t stop_time;
 
     void run_rt(){
       hal_ticks++;
+
   
       for(uint32_t i = 0; i < funcs; i++){
         if(comps[hal_slot][i]){
+          start_time = TIM1->CNT;
+          if(TIM1->CR1 & TIM_CR1_DIR){
+            start_time = TIM1->ARR - start_time;
+          }
+          else{
+            start_time += TIM1->ARR;
+          }
           comps[hal_slot][i]->rt_func(ctx, hal_slot);
+          stop_time = TIM1->CNT;
+
+          if(TIM1->CR1 & TIM_CR1_DIR){
+            stop_time = TIM1->ARR - stop_time;
+          }
+          else{
+            stop_time += TIM1->ARR;
+          }
+
+          comps[hal_slot][i]->min_time = stop_time - start_time;
+          comps[hal_slot][i]->max_time = stop_time;          
         }
       }
 
