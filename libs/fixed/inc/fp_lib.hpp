@@ -89,8 +89,9 @@ class fixed{
     fixed() = default;
     fixed(int v) : data (v * (1 << fbits)) {}
     fixed(int32_t v) : data (v * (1 << fbits)) {}
-    fixed(uint32_t v) : data (v * (1 << fbits)) {}
+    fixed(uint32_t v) : data (v * (1 << fbits)) {}  
     fixed(float v) : data (v * (1 << fbits)) {}
+    fixed(double v) : data (v * (1 << fbits)) {}
 };
 
 class tfixed{
@@ -111,7 +112,7 @@ class tfixed{
         return(r);
     }
 
-    constexpr operator int32_t() {
+    explicit constexpr operator int32_t() {
         return(data >> fbits);
     }
 };
@@ -168,7 +169,7 @@ constexpr tfixed operator /(fixed<bl> left, fixed<br> right) {
     r.fbits = left.fbits;
     r.ibits = 64 - left.fbits;
     r.data = left.data / right.data;
-    r.data >>= right.fbits;
+    r.data <<= right.fbits;
     return(r);
 }
 #else
