@@ -7,8 +7,9 @@ class hal_comp{
   public:
     uint32_t min_time;
     uint32_t max_time;
-    virtual void rt_func(hal_ctx_t* ctx, uint32_t hal_slot){}
+    virtual void rt(hal_ctx_t* ctx, uint32_t hal_slot){}
     virtual void init(hal_ctx_t* ctx){}
+    virtual void nrt(hal_ctx_t* ctx){}
 };
 
 template<uint32_t slots, uint32_t funcs>
@@ -25,6 +26,7 @@ class hal_t{
   
       for(uint32_t i = 0; i < funcs; i++){
         if(comps[hal_slot][i]){
+          GPIOC->ODR |= GPIO_ODR_ODR5;
           start_time = TIM1->CNT;
           if(TIM1->CR1 & TIM_CR1_DIR){
             start_time = TIM1->ARR - start_time;
@@ -32,7 +34,7 @@ class hal_t{
           else{
             start_time += TIM1->ARR;
           }
-          comps[hal_slot][i]->rt_func(ctx, hal_slot);
+          comps[hal_slot][i]->rt(ctx, hal_slot);
           stop_time = TIM1->CNT;
 
           if(TIM1->CR1 & TIM_CR1_DIR){
@@ -43,12 +45,23 @@ class hal_t{
           }
 
           comps[hal_slot][i]->min_time = stop_time - start_time;
-          comps[hal_slot][i]->max_time = stop_time;          
+          comps[hal_slot][i]->max_time = stop_time;
+          GPIOC->ODR &= ~GPIO_ODR_ODR5;
         }
       }
 
       hal_slot++;
       hal_slot %= slots;
+    }
+
+    void run_nrt(){
+      for(uint32_t slot = 0; slot < slots; slot++){
+        for(uint32_t comp = 0; comp < funcs; comp++){
+          if(comps[slot][comp]){
+            comps[slot][comp]->nrt(ctx);
+          }
+        }
+      }
     }
 
     void run_init(){
