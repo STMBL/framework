@@ -1,6 +1,9 @@
+
 #include <stdint.h>
+#include "stm32f1xx.h"
 #include <fp_lib.hpp>
 #include <sys.hpp>
+
 #pragma once 
 
 class hal_comp{
