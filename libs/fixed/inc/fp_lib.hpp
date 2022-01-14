@@ -55,7 +55,7 @@ class fixed{
         }
         else{
             r.data = -data;
-            r.data &= (0xffffffff << (32 - b));
+            r.data &= (0xffffffff >> (32 - b));
             r.data = -r.data;
         }
         return(r);
@@ -281,6 +281,48 @@ fixed<bl>& operator -=(fixed<bl>& left, const int32_t& right){
     return(left);
 }
 
+// template<uint8_t bl, uint8_t br>
+// bool operator< (fixed<bl>left, fixed<br> right){
+//   tfixed r;
+//   tfixed l;
+
+//   l.data = left.data << br;
+//   r.data = right.data << bl;
+//   return(l.data < r.data);
+// }
+
+// template<uint8_t bl, uint8_t br>
+// bool operator> (fixed<bl>left, fixed<br> right){
+//   tfixed r;
+//   tfixed l;
+
+//   l.data = left.data << br;
+//   r.data = right.data << bl;
+//   return(l.data > r.data);
+// }
+
+template<uint8_t bl, uint8_t br>
+constexpr bool operator< (fixed<bl> left, fixed<br> right){
+
+  int32_t l, r;
+  l = left.data;
+  r = right.data;
+
+  if(bl < br){
+    l >>= br - bl;
+  }
+  if(bl > br){
+    r >>= bl - br;
+  }
+
+  return(l < r);
+}
+
+template<uint8_t bl, uint8_t br>
+constexpr bool operator> (fixed<bl> left, fixed<br> right){
+  return(right < left);
+}
+
 fixed<16> cosfp(fixed<16> v);
 
 inline fixed<16> sinfp(fixed<16> v){
@@ -291,3 +333,25 @@ inline fixed<16> sinfp(fixed<16> v){
 typedef fixed<24> q8_24;
 typedef fixed<16> q16_16;
 typedef fixed<8> q24_8;
+
+
+constexpr auto CLAMP(const auto x, const auto low, const auto high){
+  if(x > high){
+    return(high);
+  }
+  if(x < low){
+    return(low);
+  }
+  return(x);
+}
+
+constexpr auto LIMIT(const auto x, const auto lowhigh){
+  return(CLAMP(x, -lowhigh, lowhigh));
+}
+
+constexpr auto ABS(const auto x){
+  if(x < q16_16(0)){
+    return(-x);
+  }
+  return(x);
+}

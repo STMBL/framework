@@ -29,7 +29,7 @@ class hal_t{
   
       for(uint32_t i = 0; i < funcs; i++){
         if(comps[hal_slot][i]){
-          GPIOC->ODR |= GPIO_ODR_ODR5;
+          // GPIOC->ODR |= GPIO_ODR_ODR5;
           start_time = TIM1->CNT;
           if(TIM1->CR1 & TIM_CR1_DIR){
             start_time = TIM1->ARR - start_time;
@@ -49,7 +49,7 @@ class hal_t{
 
           comps[hal_slot][i]->min_time = stop_time - start_time;
           comps[hal_slot][i]->max_time = stop_time;
-          GPIOC->ODR &= ~GPIO_ODR_ODR5;
+          // GPIOC->ODR &= ~GPIO_ODR_ODR5;
         }
       }
 
