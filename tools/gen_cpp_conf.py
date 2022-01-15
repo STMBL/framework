@@ -2,6 +2,16 @@ import sys
 
 conf_objs = []
 
+def name_hash(s):
+  r = 0
+  for i in range(0, 4):
+    if i < len(s):
+      r <<= 8
+      r += ord(s[i])
+    else:
+      r <<= 8
+  return r
+
 
 header = open(sys.argv[2], 'w')
 code = open(sys.argv[3], 'w')
@@ -14,7 +24,7 @@ with open(sys.argv[1]) as f:
   for line in f:
     start = line.split(" ")[0]
     if start == "//":
-      header.write(line + "\n")
+      header.write("  " + line)
     elif start == "\n":
       header.write("\n")
     else:
@@ -49,11 +59,12 @@ with open(sys.argv[1]) as f:
         type = "conf_t::" + name + "_t"
         tup = (type, name, conf_name)
         conf_objs.append(tup)
-        header.write("  enum " + name + "_t { // " + conf_name + "\n")
+        header.write("  enum class " + name + "_t { // " + conf_name + "\n")
         for v in values:
-          header.write("    " + v + ",\n")
+          # header.write("    " + v + ",\n")
 #          header.write("    " + v + " = name<4>(\"" + v + "\"),\n")
-        header.write("  } " + name + " = " + default + ";\n")
+          header.write("    " + v + " = " + str(name_hash(v)) + ",\n")
+        header.write("  } " + name + " = " + name + "_t::" + default + ";\n")
   header.write("};\n")
 header.close()
 
