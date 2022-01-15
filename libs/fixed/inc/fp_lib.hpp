@@ -355,3 +355,18 @@ constexpr auto ABS(const auto x){
   }
   return(x);
 }
+
+constexpr auto SIGN(const auto x){
+  if(x < q16_16(0)){
+    return(-1);
+  }
+  if(x > q16_16(0)){
+    return(1);
+  }
+  return(0);
+}
+
+template<uint8_t bl>
+constexpr auto SIGN2(const fixed<bl> x, const auto a){
+  return(CLAMP(fixed<bl>(x * a), fixed<bl>(-1), fixed<bl>(1)));
+}
