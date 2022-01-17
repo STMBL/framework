@@ -185,6 +185,12 @@ constexpr tfixed operator /(fixed<bl> left, fixed<br> right) {
 }
 #endif
 
+template<uint8_t br>
+fixed<br> operator /(const int32_t left, const fixed<br> right){
+    fixed<br>r = fixed<br>(left) / right;
+    return(r);
+}
+
 template<uint8_t bl, uint8_t br>
 constexpr tfixed operator +(fixed<bl> left, fixed<br> right) {
     tfixed r;
@@ -323,6 +329,26 @@ constexpr bool operator> (fixed<bl> left, fixed<br> right){
   return(right < left);
 }
 
+template<uint8_t bl>
+constexpr bool operator< (fixed<bl> left, int right){
+  return(left < fixed<bl>(right));
+}
+
+template<uint8_t bl>
+constexpr bool operator> (fixed<bl> left, int right){
+  return(left > fixed<bl>(right));
+}
+
+template<uint8_t br>
+constexpr bool operator< (int left, fixed<br> right){
+  return(right > fixed<br>(left));
+}
+
+template<uint8_t br>
+constexpr bool operator> (int left, fixed<br> right){
+  return(right < fixed<br>(left));
+}
+
 fixed<16> cosfp(fixed<16> v);
 
 inline fixed<16> sinfp(fixed<16> v){
@@ -334,33 +360,110 @@ typedef fixed<24> q8_24;
 typedef fixed<16> q16_16;
 typedef fixed<8> q24_8;
 
-
-constexpr auto CLAMP(const auto x, const auto low, const auto high){
-  if(x > high){
-    return(high);
+template<uint8_t b>
+constexpr auto MAX(const fixed<b> l, const fixed<b> r){
+  if(l > r){
+    return(l);
   }
-  if(x < low){
-    return(low);
-  }
-  return(x);
+  return(r);
 }
 
-constexpr auto LIMIT(const auto x, const auto lowhigh){
+template<uint8_t b>
+constexpr auto MIN(const fixed<b> l, const fixed<b> r){
+  if(l < r){
+    return(l);
+  }
+  return(r);
+}
+
+template<uint8_t b>
+constexpr auto MAX(const fixed<b> l, const int r){
+  if(l > fixed<b>(r)){
+    return(l);
+  }
+  return(fixed<b>(r));
+}
+
+template<uint8_t b>
+constexpr auto MIN(const fixed<b> l, const int r){
+  if(l < fixed<b>(r)){
+    return(l);
+  }
+  return(fixed<b>(r));
+}
+
+template<uint8_t b>
+constexpr auto MAX(int const l, const fixed<b> r){
+  return(MAX(r, l));
+}
+
+template<uint8_t b>
+constexpr auto MIN(int const l, const fixed<b> r){
+  return(MIN(r, l));
+}
+
+constexpr auto MAX3(const auto l, const auto m, const auto r){
+  return(MAX(MAX(l, m), r));
+}
+
+constexpr auto MIN3(const auto l, const auto m, const auto r){
+  return(MIN(MIN(l, m), r));
+}
+
+template<uint8_t bl, uint8_t bm, uint8_t br>
+constexpr fixed<bl> CLAMP(const fixed<bl>x, const fixed<bm>low, const fixed<br>high){
+  return(MIN(MAX(x, low), high));
+}
+
+template<uint8_t bl, uint8_t bm>
+constexpr fixed<bl> CLAMP(const fixed<bl>x, const fixed<bm>low, const int high){
+  return(CLAMP(x, low, fixed<bl>(high)));
+}
+
+template<uint8_t bl, uint8_t br>
+constexpr fixed<bl> CLAMP(const fixed<bl>x, const int low, const fixed<br>high){
+  return(CLAMP(x, fixed<bl>(low), high));
+}
+
+template<uint8_t bl>
+constexpr fixed<bl> CLAMP(const fixed<bl>x, const int low, const int high){
+  return(CLAMP(x, fixed<bl>(low), fixed<bl>(high)));
+}
+
+template<uint8_t bl, uint8_t br>
+constexpr fixed<bl> LIMIT(const fixed<bl>x, const fixed<br>lowhigh){
   return(CLAMP(x, -lowhigh, lowhigh));
 }
 
-constexpr auto ABS(const auto x){
-  if(x < q16_16(0)){
+template<uint8_t bl>
+constexpr fixed<bl> LIMIT(const fixed<bl>x, const int lowhigh){
+  return(CLAMP(x, -lowhigh, lowhigh));
+}
+
+template<uint8_t bl, uint8_t bm, uint8_t br>
+constexpr q8_24 SCALE(const fixed<bl>x, const fixed<bm>low, const fixed<br>high){
+  fixed<br> delta = high - low;
+  fixed<bl>tx = x - low;
+  q8_24 r = tx / delta;
+  r = CLAMP(r, 0, 1);
+
+  return(r);
+}
+
+template<uint8_t b>
+constexpr auto ABS(const fixed<b>x){
+  if(x < fixed<b>(0)){
     return(-x);
   }
   return(x);
 }
 
-constexpr auto SIGN(const auto x){
-  if(x < q16_16(0)){
+template<uint8_t b>
+constexpr auto SIGN(const fixed<b>x){
+  if(x < fixed<b>(0)){
     return(-1);
   }
-  if(x > q16_16(0)){
+  if(x > fixed<b>(0)){
     return(1);
   }
   return(0);
