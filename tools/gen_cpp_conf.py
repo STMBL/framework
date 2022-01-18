@@ -2,14 +2,14 @@ import sys
 
 conf_objs = []
 
-def name_hash(s):
+def name_hash(s, l):
   r = 0
-  for i in range(0, 4):
+  for i in range(0, l):
     if i < len(s):
       r <<= 8
       r += ord(s[i])
-    else:
-      r <<= 8
+    # else:
+    #   r <<= 8
   return r
 
 
@@ -30,7 +30,9 @@ with open(sys.argv[1]) as f:
     else:
       start, name, conf_name, default, *values = line.rstrip("\n").split(" ")
       type = ""
-      if start == "int8_t":
+      if start == "bool":
+        type = "uint32_t"
+      elif start == "int8_t":
         type = "int32_t"
       elif start == "int16_t":
         type = "int32_t"
@@ -63,7 +65,7 @@ with open(sys.argv[1]) as f:
         for v in values:
           # header.write("    " + v + ",\n")
 #          header.write("    " + v + " = name<4>(\"" + v + "\"),\n")
-          header.write("    " + v + " = " + str(name_hash(v)) + ",\n")
+          header.write("    " + v + " = " + str(name_hash(v.rstrip("\n")[::-1], 4)) + ",\n")
         header.write("  } " + name + " = " + name + "_t::" + default + ";\n")
   header.write("};\n")
 header.close()
@@ -74,7 +76,8 @@ code.write("#include <conf.hpp>\n")
 code.write("void conf_comp::set(hal_ctx_t* ctx, const char* n, uint8_t len, conf_obj::conf_obj_type_t type, uint8_t crypted, void* data){\n")
 code.write("  switch(name<6>(n)){\n")
 for obj in conf_objs:
-  code.write("    case name<6>(\"" + obj[2] + "\"):\n")
+  code.write("    case name<6>(\"" + obj[2].rstrip("\n") + "\"): // " + obj[2] + "\n")
+  # code.write("    case " + str(name_hash(obj[2].rstrip("\n"), 6)) + ": // " + obj[2] + "\n")
   code.write("      ctx->conf." + obj[1] + "= *((" + obj[0] + "*) data);\n")
   code.write("    break;\n")
 code.write("  }\n")
