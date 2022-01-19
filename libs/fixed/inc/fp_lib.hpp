@@ -23,17 +23,21 @@ class fixed{
         return(r);
     }
 
-    // constexpr operator int32_t(){
+    explicit constexpr operator int32_t() {
+        return(data >> fbits);
+    }
+
+    // constexpr operator int32_t(){  
     //     int32_t r;
     //     r = data >> fbits;
     // return(r);
     // }
 
-    constexpr int32_t intcast(){
-        int32_t r;
-        r = data >> fbits;
-    return(r);
-    }
+    // constexpr int32_t intcast(){
+    //     int32_t r;
+    //     r = data >> fbits;
+    // return(r);
+    // }
 
     constexpr fixed<b> integral() {
         fixed<b> r;
@@ -378,28 +382,36 @@ constexpr auto MIN(const fixed<b> l, const fixed<b> r){
 
 template<uint8_t b>
 constexpr auto MAX(const fixed<b> l, const int r){
-  if(l > fixed<b>(r)){
-    return(l);
-  }
-  return(fixed<b>(r));
+  return(MAX(l, fixed<b>(r)));
 }
 
 template<uint8_t b>
 constexpr auto MIN(const fixed<b> l, const int r){
-  if(l < fixed<b>(r)){
+  return(MIN(l, fixed<b>(r)));
+}
+
+template<uint8_t b>
+constexpr auto MAX(const int l, const fixed<b> r){
+  return(MAX(fixed<b>(l), r));
+}
+
+template<uint8_t b>
+constexpr auto MIN(const int l, const fixed<b> r){
+  return(MIN(fixed<b>(l), r));
+}
+
+constexpr int MAX(const int l, const int r){
+  if(l > r){
     return(l);
   }
-  return(fixed<b>(r));
+  return(r);
 }
 
-template<uint8_t b>
-constexpr auto MAX(int const l, const fixed<b> r){
-  return(MAX(r, l));
-}
-
-template<uint8_t b>
-constexpr auto MIN(int const l, const fixed<b> r){
-  return(MIN(r, l));
+constexpr int MIN(const int l, const int r){
+  if(l < r){
+    return(l);
+  }
+  return(r);
 }
 
 constexpr auto MAX3(const auto l, const auto m, const auto r){
@@ -408,6 +420,10 @@ constexpr auto MAX3(const auto l, const auto m, const auto r){
 
 constexpr auto MIN3(const auto l, const auto m, const auto r){
   return(MIN(MIN(l, m), r));
+}
+
+constexpr int CLAMP(const int x, const int low, const int high){
+  return(MIN(MAX(x, low), high));
 }
 
 template<uint8_t bl, uint8_t bm, uint8_t br>
@@ -472,4 +488,29 @@ constexpr auto SIGN(const fixed<b>x){
 template<uint8_t bl>
 constexpr auto SIGN2(const fixed<bl> x, const auto a){
   return(CLAMP(fixed<bl>(x * a), fixed<bl>(-1), fixed<bl>(1)));
+}
+
+template<uint8_t bl, uint8_t bm, uint8_t br>
+constexpr bool SAT(const fixed<bl>x, const fixed<bm>low, const fixed<br>high){
+  return((x < low) | (x > high));
+}
+
+template<uint8_t bl, uint8_t bm>
+constexpr bool SAT(const fixed<bl>x, const fixed<bm>low, const int high){
+  return(SAT(x, low, fixed<bl>(high)));
+}
+
+template<uint8_t bl, uint8_t br>
+constexpr bool SAT(const fixed<bl>x, const int low, const fixed<br>high){
+  return(SAT(x, fixed<bl>(low), high));
+}
+
+template<uint8_t bl, uint8_t br>
+constexpr bool SAT(const fixed<bl>x, const fixed<br>lowhigh){
+  return(SAT(x, -lowhigh, lowhigh));
+}
+
+template<uint8_t bl>
+constexpr bool SAT(const fixed<bl>x, const int lowhigh){
+  return(SAT(x, fixed<bl>(-lowhigh), fixed<bl>(-lowhigh)));
 }
