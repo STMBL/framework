@@ -311,6 +311,22 @@ fixed<bl>& operator -=(fixed<bl>& left, const int32_t& right){
 //   return(l.data > r.data);
 // }
 
+template<uint8_t b>
+constexpr bool operator== (fixed<b> left, fixed<b> right){
+  return(left.data == right.data);
+}
+
+
+template<uint8_t b>
+constexpr bool operator== (fixed<b> left, int right){
+  return(left.data == fixed<b>(right));
+}
+
+template<uint8_t b>
+constexpr bool operator== (int left, fixed<b> right){
+  return(fixed<b>(left) == right);
+}
+
 template<uint8_t bl, uint8_t br>
 constexpr bool operator< (fixed<bl> left, fixed<br> right){
 
