@@ -56,7 +56,10 @@ with open(sys.argv[1]) as f:
         for f in fileds.split(" "):
           if f != "":
             header.write("        " + type + " " + f + ": 1;\n")
-        header.write("      } " + name + ";\n")
+        header.write("      } " + name + " = (" + name + "_t)" + default + ";\n")
+        type = "hal_ctx_t::" + open_struct + "_t::" + name + "_t"
+        tup = (type, open_struct + "." + name, conf_name)
+        conf_objs.append(tup)
 
     else:
       start, name, conf_name, default, *values = line.rstrip("\n").split(",")
@@ -113,6 +116,7 @@ header.close()
 code.write("#include <fp_lib.hpp>\n")
 code.write("#include <hal.hpp>\n")
 code.write("#include <conf.hpp>\n")
+
 code.write("void conf_comp::set(hal_ctx_t* ctx, const char* n, uint8_t len, conf_obj::conf_obj_type_t type, uint8_t crypted, void* data){\n")
 code.write("  switch(name<6>(n)){\n")
 for obj in conf_objs:
@@ -122,4 +126,15 @@ for obj in conf_objs:
   code.write("    break;\n")
 code.write("  }\n")
 code.write("}\n")
+
+code.write("uint32_t conf_comp::get(hal_ctx_t* ctx, const char* n){\n")
+code.write("  switch(name<6>(n)){\n")
+for obj in conf_objs:
+  code.write("    case name<6>(\"" + obj[2].rstrip("\n") + "\"): // " + obj[2] + "\n")
+  # code.write("    case " + str(name_hash(obj[2].rstrip("\n"), 6)) + ": // " + obj[2] + "\n")
+  code.write("      return(*(uint32_t*)&(ctx->" + obj[1] + "));\n")
+  code.write("    break;\n")
+code.write("  }\n")
+code.write("}\n")
+
 code.close()
