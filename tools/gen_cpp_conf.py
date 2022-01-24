@@ -16,19 +16,53 @@ def name_hash(s, l):
 header = open(sys.argv[2], 'w')
 code = open(sys.argv[3], 'w')
 
+header.write("#include \"fp_lib.hpp\"\n")
 header.write("#pragma once\n")
-header.write("template<uint8_t len> constexpr uint64_t name(const char* name);")
+header.write("\n")
+header.write("template<uint8_t len> constexpr uint64_t name(const char* name);\n")
+header.write("\n")
+
+open_struct = ""
 
 with open(sys.argv[1]) as f:
-  header.write("struct conf_t{\n")
+  header.write("class hal_ctx_t{\n")
+  header.write("  public:\n")
+  header.write("    q8_24 period;\n")
+  header.write("    uint32_t freq;\n")
+  header.write("\n")
   for line in f:
-    start = line.split(" ")[0]
+    # print("parse: " + line)
+    start, *tmp = line.rstrip("\n").split(",")
     if start == "//":
-      header.write("  " + line)
-    elif start == "\n":
+      header.write("    " + start + " ".join(tmp) + "\n")
+    elif start == "":
       header.write("\n")
+    elif start == "struct":
+      if open_struct != "":
+        header.write("    } " + open_struct + ";\n")
+        open_struct = ""
+
+      open_struct = tmp[0].strip(" ")
+      header.write("    class" + tmp[0] + "_t {\n")
+      header.write("      public:\n")
+    
+    elif start == "bit":
+        type = "uint32_t"
+        start, name, conf_name, default, fileds = line.rstrip("\n").split(",")
+        name = name.strip(" ")
+        conf_name = conf_name.strip(" ")
+        default = default.strip(" ")
+        header.write("      struct " + name + "_t {\n")
+        for f in fileds.split(" "):
+          if f != "":
+            header.write("        " + type + " " + f + ": 1;\n")
+        header.write("      } " + name + ";\n")
+
     else:
-      start, name, conf_name, default, *values = line.rstrip("\n").split(" ")
+      start, name, conf_name, default, *values = line.rstrip("\n").split(",")
+      name = name.strip(" ")
+      conf_name = conf_name.strip(" ")
+      default = default.strip(" ")
       type = ""
       if start == "bool":
         type = "uint32_t"
@@ -53,20 +87,26 @@ with open(sys.argv[1]) as f:
       elif start == "q24_8":
         type = "q24_8"
       if type != "":
-        tup = (type, name, conf_name)
+        tup = (type, open_struct + "." + name, conf_name)
         conf_objs.append(tup)
-        header.write("  " + type + " " + name + " = " + default + "; // " + conf_name + "\n")
+        header.write("      " + type + " " + name + " = " + default + "; // " + conf_name + "\n")
 
       if start == "enum":
-        type = "conf_t::" + name + "_t"
-        tup = (type, name, conf_name)
+        # print("enum ")
+        # print(values)
+        type = "hal_ctx_t::" + open_struct + "_t::" + name + "_t"
+        tup = (type, open_struct + "." + name, conf_name)
         conf_objs.append(tup)
-        header.write("  enum class " + name + "_t { // " + conf_name + "\n")
-        for v in values:
+        header.write("      enum class " + name + "_t { // " + conf_name + "\n")
+        for v in values[0].split(" "):
+          if v != "":
           # header.write("    " + v + ",\n")
 #          header.write("    " + v + " = name<4>(\"" + v + "\"),\n")
-          header.write("    " + v + " = " + str(name_hash(v.rstrip("\n")[::-1], 4)) + ",\n")
-        header.write("  } " + name + " = " + name + "_t::" + default + ";\n")
+            header.write("        " + v + " = " + str(name_hash(v.rstrip("\n")[::-1], 4)) + ",\n")
+        header.write("      } " + name + " = " + name + "_t::" + default + ";\n")
+  if open_struct != "":
+    header.write("    } " + open_struct + ";\n")
+    open_struct = ""
   header.write("};\n")
 header.close()
 
@@ -78,7 +118,7 @@ code.write("  switch(name<6>(n)){\n")
 for obj in conf_objs:
   code.write("    case name<6>(\"" + obj[2].rstrip("\n") + "\"): // " + obj[2] + "\n")
   # code.write("    case " + str(name_hash(obj[2].rstrip("\n"), 6)) + ": // " + obj[2] + "\n")
-  code.write("      ctx->conf." + obj[1] + "= *((" + obj[0] + "*) data);\n")
+  code.write("      ctx->" + obj[1] + "= *((" + obj[0] + "*) data);\n")
   code.write("    break;\n")
 code.write("  }\n")
 code.write("}\n")
