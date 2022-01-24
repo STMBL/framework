@@ -135,6 +135,7 @@ for obj in conf_objs:
   code.write("      return(*(uint32_t*)&(ctx->" + obj[1] + "));\n")
   code.write("    break;\n")
 code.write("  }\n")
+code.write("  return(0);\n")
 code.write("}\n")
 
 code.close()
