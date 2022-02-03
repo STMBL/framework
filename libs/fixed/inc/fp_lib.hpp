@@ -329,17 +329,23 @@ constexpr bool operator== (int left, fixed<b> right){
 
 template<uint8_t bl, uint8_t br>
 constexpr bool operator< (fixed<bl> left, fixed<br> right){
-
-  int32_t l, r;
+  int64_t l, r;
   l = left.data;
   r = right.data;
 
   if(bl < br){
-    l >>= br - bl;
+    l <<= br - bl;
   }
   if(bl > br){
-    r >>= bl - br;
+    r <<= bl - br;
   }
+
+  // if(bl > br){
+  //   l >>= bl - br;
+  // }
+  // if(bl < br){
+  //   r >>= br - bl;
+  // }
 
   return(l < r);
 }
