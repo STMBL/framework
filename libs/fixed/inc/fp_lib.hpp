@@ -90,6 +90,22 @@ class fixed{
         return(r);
     }
 
+    constexpr static fixed<b> delta(){
+      fixed<b> r;
+      r.data = 1;
+      return(r);
+    }
+
+    constexpr static fixed<b> max(){
+      fixed<b> r;
+      r.data = 1 << 31;
+      return(r);
+    }
+
+    constexpr static fixed<b> min(){
+      return(-max());
+    }
+
     fixed() = default;
     fixed(int v) : data (v * (1 << fbits)) {}
     fixed(int32_t v) : data (v * (1 << fbits)) {}
