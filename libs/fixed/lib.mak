@@ -4,5 +4,6 @@ ifneq (,$(findstring fixed, $(LIBS)))
   $(info using LIB: $(LIBPATH))
 
   INCDIRS := $(INCDIRS) $(LIBPATH)/inc
-  LIBSOURCES := $(LIBSOURCES) $(wildcard $(LIBPATH)/src/*.cpp)
+#  LIBSOURCES := $(LIBSOURCES) $(wildcard $(LIBPATH)/src/*.cpp)
+  LIBSOURCES := $(LIBSOURCES) $(LIBPATH)/src/fp_lib.cpp
 endif

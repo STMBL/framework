@@ -65,6 +65,10 @@ class fixed{
         return(r);
     }
 
+    // constexpr fixed<b> inv() {
+    //     fixed<32 - b> r = fixed<24>(1) / *(this);
+    //     return(r);
+    // }
 
     constexpr fixed<b>& operator ++() {
         data += (1 << b);
@@ -504,13 +508,20 @@ constexpr q8_24 SCALE(const fixed<bl>x, const fixed<bm>low, const fixed<br>high)
   return(r);
 }
 
-template<uint8_t b>
-constexpr auto ABS(const fixed<b>x){
-  if(x < fixed<b>(0)){
+constexpr auto ABS(auto x){
+  if(x < 0){
     return(-x);
   }
   return(x);
 }
+
+// template<uint8_t b>
+// constexpr auto ABS(const fixed<b>x){
+//   if(x < fixed<b>(0)){
+//     return(-x);
+//   }
+//   return(x);
+// }
 
 template<uint8_t b>
 constexpr auto SIGN(const fixed<b>x){
@@ -552,3 +563,9 @@ template<uint8_t bl>
 constexpr bool SAT(const fixed<bl>x, const int lowhigh){
   return(SAT(x, fixed<bl>(-lowhigh), fixed<bl>(-lowhigh)));
 }
+
+const q8_24 PI = 3.14159265359;
+const q8_24 SQRT2 = 1.41421356237;
+const q8_24 SQRT3 = 1.73205080757;
+const q8_24 SQRT2_INV = 0.70710678118;
+const q8_24 SQRT3_INV = 0.57735026919;
