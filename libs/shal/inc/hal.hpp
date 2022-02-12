@@ -2,14 +2,14 @@
 #include <stdint.h>
 #include "stm32f1xx.h"
 #include <fp_lib.hpp>
-#include "gen_conf.hpp"
+#include "hal_pins.hpp"
 
 #pragma once 
 
 class hal_comp{
   public:
-    uint32_t min_time;
-    uint32_t max_time;
+    uint32_t time = 0;
+    uint32_t max_time = 0;
     virtual void rt(hal_ctx_t* ctx, uint32_t hal_slot){}
     virtual void init(hal_ctx_t* ctx){}
     virtual void nrt(hal_ctx_t* ctx){}
@@ -20,8 +20,8 @@ class hal_t{
   public:
     hal_ctx_t* ctx;
     uint64_t hal_ticks;
-    uint32_t start_time;
-    uint32_t stop_time;
+    int32_t start_time = 0;
+    int32_t stop_time = 0;
 
     void run_rt(){
       hal_ticks++;
@@ -29,27 +29,14 @@ class hal_t{
   
       for(uint32_t i = 0; i < funcs; i++){
         if(comps[hal_slot][i]){
-          // GPIOC->ODR |= GPIO_ODR_ODR5;
           start_time = TIM1->CNT;
-          if(TIM1->CR1 & TIM_CR1_DIR){
-            start_time = TIM1->ARR - start_time;
-          }
-          else{
-            start_time += TIM1->ARR;
-          }
           comps[hal_slot][i]->rt(ctx, hal_slot);
           stop_time = TIM1->CNT;
+          int32_t diff = stop_time - start_time;
+          diff = ABS(diff);
 
-          if(TIM1->CR1 & TIM_CR1_DIR){
-            stop_time = TIM1->ARR - stop_time;
-          }
-          else{
-            stop_time += TIM1->ARR;
-          }
-
-          comps[hal_slot][i]->min_time = stop_time - start_time;
-          comps[hal_slot][i]->max_time = stop_time;
-          // GPIOC->ODR &= ~GPIO_ODR_ODR5;
+          comps[hal_slot][i]->time = diff;
+          comps[hal_slot][i]->max_time = MAX(comps[hal_slot][i]->max_time, diff);
         }
       }
 
@@ -87,7 +74,7 @@ class hal_t{
     }
 
 
+    hal_comp* comps[slots][funcs];
   private:
     uint32_t hal_slot;
-    hal_comp* comps[slots][funcs];
 };
