@@ -100,7 +100,14 @@ for comp_name, pins in comps.items():
     
 
 
-header.write("    };\n")
+header.write("    };\n\n")
+
+header.write("    const struct hal_cmd_t{\n")
+header.write("      const char * name;\n")
+header.write("      void * ptr;\n")
+header.write("    } hal_cmds[" + str(pin_count) + "] = {\n")
+header.write("    };\n\n")
+
 header.write("};\n\n")
 
 header.close()
