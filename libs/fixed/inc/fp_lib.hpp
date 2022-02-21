@@ -186,7 +186,7 @@ constexpr tfixed operator *(fixed<bl> left, fixed<br> right) {
 }
 
 
-#ifndef FP_USE_64Bit_DIV
+#if defined FP_USE_64Bit_DIV
 template<uint8_t bl, uint8_t br>
 constexpr tfixed operator /(fixed<bl> left, fixed<br> right) {
     tfixed r;
@@ -196,7 +196,7 @@ constexpr tfixed operator /(fixed<bl> left, fixed<br> right) {
     r.data <<= right.fbits;
     return(r);
 }
-#else
+#elif defined FP_USE_32Bit_DIV
 template<uint8_t bl, uint8_t br>
 constexpr tfixed operator /(fixed<bl> left, fixed<br> right) {
     tfixed r;
@@ -206,6 +206,13 @@ constexpr tfixed operator /(fixed<bl> left, fixed<br> right) {
     r.data <<= right.fbits;
     r.data /= right.data;
     return(r);
+}
+#else
+template<uint8_t bl, uint8_t br>
+constexpr tfixed operator /(fixed<bl> left, fixed<br> right) {
+    fixed<32 - right.fbits> inv;
+    inv.data = ((int32_t)(1 << 30)) / (right.data >> 2);
+    return(left * inv);
 }
 #endif
 
