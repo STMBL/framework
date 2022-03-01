@@ -13,7 +13,7 @@ def name_hash(s, l):
 comps = {}
 pin_count = 0
 
-q_types = ["Q8_24", "Q16_16", "Q24_8", "C8_24", "C16_16", "C24_8", "INT32_T", "UINT32_T", "ENUM"]
+q_types = ["Q8_24", "Q16_16", "Q24_8", "C8_24", "C16_16", "C24_8", "INT32_T", "UINT32_T", "ENUM", "FIFO"]
 
 for file in sys.argv[2:]:
   print("\033[92m" + "parse file: " + file + "\033[0m")
@@ -45,6 +45,7 @@ for file in sys.argv[2:]:
 
 header = open(sys.argv[1], 'w')
 header.write("#include \"fp_lib.hpp\"\n")
+header.write("#include \"fifo.hpp\"\n")
 header.write("#pragma once\n")
 header.write("\n")
 header.write("class hal_ctx_t {\n")
@@ -68,6 +69,10 @@ for comp_name, pins in comps.items():
       for e in type.split(" ")[1:]:
         header.write("        " + e + " = " + str(name_hash(e.rstrip("\n")[::-1], 4)) + ",\n")
       header.write("      } " + pin_name + " = hal_ctx_t::" + comp_name + "_t::" + pin_name + "_t::" + type.split(" ")[1] +  ";\n\n")
+    
+    elif type[0:4] == "fifo":
+      type, count = type.split(" ")
+      header.write("      " + type + "_t<" + count + "> " + pin_name + ";\n")
     
     else:
       header.write("      " + type + " " + pin_name + " = 0;\n")
@@ -94,6 +99,8 @@ for comp_name, pins in comps.items():
       header.write("      {\"" + comp_name + "." + pin_name + "\", (void *)&(" + comp_name + "." + pin_name + "), hal_pin_t::type_t::UINT32_T},\n")
       for i, e in enumerate(type.split(" ")[1:]):
         header.write("      {\"" + comp_name + "." + pin_name + "." + e + "\", (void *)&(" + comp_name + "." + pin_name + "), hal_pin_t::type_t::B" + str(i) + "},\n")
+    elif type[0:4] == "fifo":
+      header.write("      {\"" + comp_name + "." + pin_name + "\", (void *)&(" + comp_name + "." + pin_name + "), hal_pin_t::type_t::" + type.split(" ")[0].upper() + "},\n")
     else:
       header.write("      {\"" + comp_name + "." + pin_name + "\", (void *)&(" + comp_name + "." + pin_name + "), hal_pin_t::type_t::" + type.upper() + "},\n")
 
