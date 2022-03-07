@@ -5,7 +5,7 @@
 
 template<uint32_t count>
 class fifo_t{
-  public:
+  private:
     uint8_t data[count];
     uint32_t read_ptr = 0;
     uint32_t write_ptr = 0;
@@ -24,11 +24,12 @@ class fifo_t{
     uint8_t pop(){
       uint8_t r = data[read_ptr++];
       read_ptr %= count;
+      temp_read_ptr = read_ptr;
       return(r);
     }
 
     uint32_t free(){
-      return((write_ptr + count - read_ptr) % count);
+      return(count - (write_ptr + count - read_ptr) % count);
     }
 
     uint32_t size(){
@@ -69,4 +70,8 @@ class fifo_t{
       return(data + write_ptr);
     }
 
+    void set_write_ptr(uint32_t ptr){
+      write_ptr = ptr;
+      write_ptr %= count;
+    }
 };
