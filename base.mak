@@ -150,7 +150,7 @@ GIT_HASH := $(shell git describe --always --dirty)
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 USR := $(shell whoami)
 HOST := $(shell hostname)
-CRC = $(shell crc32 $(basename $@).bin)
+CRC = 0#$(shell crc32 $(basename $@).bin)
 BIN_SIZE = $(strip $(shell wc -c < $(basename $@).bin))
 CPPFLAGS += -DGIT_HASH=$(GIT_HASH)
 CPPFLAGS += -DGIT_BRANCH=$(GIT_BRANCH)
@@ -164,9 +164,12 @@ endif
 
 # Link: create ELF output file from object files
 #
-build/fw.elf: build/fw.tmp_pre
+
+build/fw.tmp_pre2: build/fw.tmp_pre
 	@echo Post-processing: $@
 	$(Q)$(OBJCOPY) -O binary --gap-fill 0xFF $< $(basename $@).bin
+
+build/fw.elf: build/fw.tmp_pre2
 	$(Q)$(CC) $(OBJECTS) $(LDFLAGS) -Xlinker --defsym=BIN_CRC=0 -Xlinker --defsym=BIN_SIZE=$(BIN_SIZE) --output $(basename $@).tmp
 	$(Q)$(CC) $(OBJECTS) $(LDFLAGS) -Xlinker --defsym=BIN_CRC=0x$(CRC) -Xlinker --defsym=BIN_SIZE=$(BIN_SIZE) --output $(basename $@).elf
 
