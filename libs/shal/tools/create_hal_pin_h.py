@@ -6,12 +6,11 @@ def name_hash(s, l):
     if i < len(s):
       r <<= 8
       r += ord(s[i])
-    # else:
-    #   r <<= 8
   return r
 
 comps = {}
 pin_count = 0
+cmd_count = 0
 
 q_types = ["Q8_24", "Q16_16", "Q24_8", "C8_24", "C16_16", "C24_8", "INT32_T", "UINT32_T", "ENUM", "FIFO"]
 
@@ -67,7 +66,7 @@ for comp_name, pins in comps.items():
     elif type[0:4] == "enum":
       header.write("      enum class " + pin_name + "_t {\n")
       for e in type.split(" ")[1:]:
-        header.write("        " + e + " = " + str(name_hash(e.rstrip("\n")[::-1], 4)) + ",\n")
+        header.write("        " + e + " = " + hex(name_hash(e.rstrip("\n"), 4)) + ",\n")
       header.write("      } " + pin_name + " = hal_ctx_t::" + comp_name + "_t::" + pin_name + "_t::" + type.split(" ")[1] +  ";\n\n")
     
     elif type[0:4] == "fifo":
@@ -87,7 +86,7 @@ header.write("      enum class type_t{\n")
 for i in range(32):
     header.write("        B" + str(i) + " = " + str(i) + ",\n")
 for t in q_types:
-  header.write("        " + t + " = " + str(name_hash(t, 4)) + ",\n")
+  header.write("        " + t + " = " + hex(name_hash(t, 4)) + ",\n")
 header.write("        } type;\n")
 header.write("    } hal_pins[" + str(pin_count) + "] = {\n")
 
@@ -112,7 +111,7 @@ header.write("    };\n\n")
 header.write("    const struct hal_cmd_t{\n")
 header.write("      const char * name;\n")
 header.write("      void * ptr;\n")
-header.write("    } hal_cmds[" + str(pin_count) + "] = {\n")
+header.write("    } hal_cmds[" + str(cmd_count) + "] = {\n")
 header.write("    };\n\n")
 
 header.write("};\n\n")
