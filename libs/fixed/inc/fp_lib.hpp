@@ -27,6 +27,16 @@ class fixed{
         return(data >> fbits);
     }
 
+    #ifdef FP_USE_FLOAT
+    explicit constexpr operator float() {
+        return (static_cast<float>(data) / static_cast<float>(1 << fbits));
+    }
+
+    explicit constexpr operator double() {
+        return (static_cast<double>(data) / static_cast<double>(1 << fbits));
+    }
+    #endif
+
     // constexpr operator int32_t(){  
     //     int32_t r;
     //     r = data >> fbits;
@@ -94,26 +104,30 @@ class fixed{
         return(r);
     }
 
+    //smallest positive number of type
     constexpr static fixed<b> delta(){
       fixed<b> r;
       r.data = 1;
       return(r);
     }
-
+    //largest number of type
     constexpr static fixed<b> max(){
       fixed<b> r;
-      r.data = 1 << 31;
+      r.data = 0x7fffffff;
       return(r);
     }
-
+    //smallest number of type
     constexpr static fixed<b> min(){
-      return(-max());
+      fixed<b> r;
+      r.data = 0x80000000;
+      return(r);
     }
 
     fixed() = default;
     fixed(int v) : data (v * (1 << fbits)) {}
-    fixed(int32_t v) : data (v * (1 << fbits)) {}
-    fixed(uint32_t v) : data (v * (1 << fbits)) {}  
+    fixed(unsigned int v) : data (v * (1 << fbits)) {}
+    fixed(long int v) : data (v * (1 << fbits)) {}
+    fixed(unsigned long int v) : data (v * (1 << fbits)) {} 
     fixed(float v) : data (v * (1 << fbits)) {}
     fixed(double v) : data (v * (1 << fbits)) {}
 };
