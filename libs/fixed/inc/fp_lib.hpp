@@ -148,12 +148,12 @@ constexpr fixed<bl> operator -(fixed<bl> right) {
     return(r);
 }
 
-    template<uint8_t bl>
-    constexpr fixed<bl> operator *(fixed<bl> left, int32_t right) {
-        fixed<bl> r;
-        r.data = left.data * right;
-        return(r);
-    }
+template<uint8_t bl>
+constexpr fixed<bl> operator *(fixed<bl> left, int32_t right) {
+    fixed<bl> r;
+    r.data = left.data * right;
+    return(r);
+}
 
 template<uint8_t bl>
 constexpr fixed<bl> operator /(fixed<bl> left, int32_t right) {
