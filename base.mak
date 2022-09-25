@@ -296,6 +296,10 @@ include ../../framework/toolchain.mak
 #
 -include $(OBJECTS:.o=.d)
 
+test: $(TESTSOURCES)
+	@$(HOSTCXX) -I$(FRAMEWORK_DIR)/libs/catch2/ $(addprefix -I,$(INCDIRS)) -std=c++20 -pedantic -Wall -Wfatal-errors $(TESTSOURCES) $(FRAMEWORK_DIR)/libs/catch2/main.cpp  -o build/test
+	build/test
+
 force_look:
 	@true
 
