@@ -3,20 +3,6 @@
 #define FP_USE_IOSTREAM
 #include <fp_lib.hpp>
 
-template<uint8_t b>
-std::ostream& operator<<(std::ostream& os, const fixed<b>& p)
-{
-    fixed v = p;
-    os << static_cast<const int32_t>(v.integral()) << ".";
-    v = ABS(v.fractional());
-    do{
-        v *= 10;
-        os << static_cast<const int32_t>(v.integral());
-        v = v.fractional();
-    }while(v > 0);
-    return os;
-}
-
 TEMPLATE_TEST_CASE("mehrere", "blupp", q8_24, q16_16, q24_8){
     TestType yalla = TestType(0);
     TestType foo = TestType(1.5);

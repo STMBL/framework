@@ -1,5 +1,8 @@
-#include <stdint.h>
 #pragma once
+#include <stdint.h>
+#ifdef FP_USE_IOSTREAM
+#include <iostream>
+#endif
 
 #ifndef M_PI
 #define M_PI  3.1415926535
@@ -422,6 +425,22 @@ inline fixed<16> sinfp(fixed<16> v){
   const fixed<16> p = 0.25;
   return(cosfp(v - p));
 }
+
+#ifdef FP_USE_IOSTREAM
+template<uint8_t b>
+std::ostream& operator<<(std::ostream& os, const fixed<b>& p)
+{
+    fixed v = p;
+    os << static_cast<const int32_t>(v.integral()) << ".";
+    v = ABS(v.fractional());
+    do{
+        v *= 10;
+        os << static_cast<const int32_t>(v.integral());
+        v = v.fractional();
+    }while(v > 0);
+    return os;
+}
+#endif
 
 typedef fixed<24> q8_24;
 typedef fixed<16> q16_16;
