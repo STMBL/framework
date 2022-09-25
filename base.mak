@@ -208,34 +208,34 @@ build/fw.bin: build/fw.elf
 
 # Compile: create object files from C source files
 
-build/gen/%.o : build/gen/src/%.c #$(GENINCS) $(GENSOURCES)
+build/gen/%.o : build/gen/src/%.c $(GENINCS) $(GENSOURCES)
 	@echo Compiling gen C: $<
 	@$(MKDIR) -p $(dir $@)
 	$(Q)$(CC) -c $(CPPFLAGS) $(CFLAGS) $(GENDEPFLAGS) $< -o $@ 
 
-build/libs/%.o : ../../framework/libs/%.c #$(GENINCS) $(GENSOURCES)
+build/libs/%.o : ../../framework/libs/%.c $(GENINCS) $(GENSOURCES)
 	@echo Compiling lib C: $<
 	@$(MKDIR) -p $(dir $@)
 	$(Q)$(CC) -c $(CPPFLAGS) $(CFLAGS) $(GENDEPFLAGS) $< -o $@ 
 
-build/%.o : src/%.c #$(GENINCS) $(GENSOURCES)
+build/%.o : src/%.c $(GENINCS) $(GENSOURCES)
 	@echo Compiling C: $<
 	@$(MKDIR) -p $(dir $@)
 	$(Q)$(CC) -c $(CPPFLAGS) $(CFLAGS) $(GENDEPFLAGS) $< -o $@ 
 
 # Compile: create object files from C++ source files
 
-build/gen/%.o : build/gen/src/%.cpp #$(GENINCS) $(GENSOURCES)
+build/gen/%.o : build/gen/src/%.cpp $(GENINCS) $(GENSOURCES)
 	@echo Compiling gen C++: $<
 	@$(MKDIR) -p $(dir $@)
 	$(Q)$(Cxx) -c $(CPPFLAGS) $(CXXFLAGS) $(GENDEPFLAGS) $< -o $@ 
 
-build/libs/%.o : ../../framework/libs/%.cpp #$(GENINCS) $(GENSOURCES)
+build/libs/%.o : ../../framework/libs/%.cpp $(GENINCS) $(GENSOURCES)
 	@echo Compiling lib C++: $<
 	@$(MKDIR) -p $(dir $@)
 	$(Q)$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(GENDEPFLAGS) $< -o $@ 
 
-build/%.o : src/%.cpp #$(GENINCS) $(GENSOURCES)
+build/%.o : src/%.cpp $(GENINCS) $(GENSOURCES)
 	@echo Compiling C++: $<
 	@$(MKDIR) -p $(dir $@)
 	$(Q)$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(GENDEPFLAGS) $< -o $@ 
@@ -247,12 +247,12 @@ build/%.o : src/%.cpp #$(GENINCS) $(GENSOURCES)
 
 # Assemble: create object files from assembler source files
 #
-build/%.o : %.s #$(GENINCS) $(GENSOURCES)
+build/%.o : %.s $(GENINCS) $(GENSOURCES)
 	@echo Assembling: $<
 	@$(MKDIR) -p $(dir $@)
 	$(Q)$(CC) -c $(CPPFLAGS) $(ASFLAGS) $(GENDEPFLAGS) $< -o $@
 
-build/libs/%.o : ../../framework/libs/%.s  #$(GENINCS) $(GENSOURCES)
+build/libs/%.o : ../../framework/libs/%.s  $(GENINCS) $(GENSOURCES)
 	@echo Assembling: $<
 	@$(MKDIR) -p $(dir $@)
 	$(Q)$(CC) -c $(CPPFLAGS) $(ASFLAGS) $(GENDEPFLAGS) $< -o $@
@@ -297,6 +297,7 @@ include ../../framework/toolchain.mak
 -include $(OBJECTS:.o=.d)
 
 test: $(TESTSOURCES)
+	@$(MKDIR) -p build/
 	@$(HOSTCXX) -I$(FRAMEWORK_DIR)/libs/catch2/ $(addprefix -I,$(INCDIRS)) -std=c++20 -pedantic -Wall -Wfatal-errors $(TESTSOURCES) $(FRAMEWORK_DIR)/libs/catch2/main.cpp  -o build/test
 	build/test
 
@@ -308,4 +309,5 @@ force_look:
 .PHONY: gccversion showsize all build clean \
         elf hex bin lss sym generate \
         format \
-        force_look
+        force_look \
+				test
