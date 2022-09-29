@@ -60,8 +60,10 @@ for comp_name, pins in comps.items():
     if type[0:3] == "bit":
       header.write("      struct " + pin_name + "_t {\n")
       for e in type.split(" ")[1:]:
-        header.write("        uint32_t " + e + " : 1;\n")
-      header.write("      } " + pin_name + " = (" + pin_name + "_t) 0;\n\n")
+        header.write("        uint32_t " + e + " : 1 = 0;\n")
+      if len(type.split(" ")[1:]) < 32:
+        header.write("        uint32_t : " + str(32 - len(type.split(" ")[1:])) + ";\n")
+      header.write("      } " + pin_name + ";\n\n")
     
     elif type[0:4] == "enum":
       header.write("      enum class " + pin_name + "_t {\n")

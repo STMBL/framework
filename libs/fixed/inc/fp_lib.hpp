@@ -137,9 +137,9 @@ class fixed{
 
 class tfixed{
     public:
+    int64_t data;
     uint8_t fbits;
     uint8_t ibits;
-    int64_t data;
 
     template<uint8_t b>
     constexpr operator fixed<b>() {

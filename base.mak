@@ -48,10 +48,11 @@ CPPFLAGS += -nostdlib
 CPPFLAGS += -fno-common
 CPPFLAGS += -fno-builtin
 CPPFLAGS += -nostartfiles
-#CPPFLAGS += -fstack-usage
-#CPPFLAGS += -Wpadded
-#CPPFLAGS += -Wunreachable-code
-#CPPFLAGS += -Wextra
+CPPFLAGS += -fstack-usage
+CPPFLAGS += -Wpadded
+CPPFLAGS += -Wunreachable-code
+CPPFLAGS += -Wextra
+CPPFLAGS += -Wno-unused-parameter
 
 #---------------- C Compiler Options ----------------
 #
@@ -88,6 +89,9 @@ LDFLAGS += -lm
 LDFLAGS += -Wl,-Map=build/fw.map,--cref
 LDFLAGS += -Wl,--gc-sections
 LDFLAGS += -specs=nano.specs -specs=nosys.specs
+
+FINAL_LDFLAGS += $(LDFLAGS)
+FINAL_LDFLAGS += -Wl,--print-memory-usage
 
 # LDFLAGS += -specs=nano.specs -u _printf_float -u _scanf_float
 # LDFLAGS += -lc -specs=nosys.specs
@@ -173,7 +177,7 @@ build/fw.elf: build/fw.tmp_pre2
 build/fw.tmp_pre: $(OBJECTS) $(LDSCRIPT)
 	@echo Linking: $@
 	@$(MKDIR) -p $(dir $@)
-	$(Q)$(CC) $(OBJECTS) $(LDFLAGS) -Xlinker --defsym=BIN_CRC=0 -Xlinker --defsym=BIN_SIZE=0 --output $(basename $@).tmp_pre
+	$(Q)$(CC) $(OBJECTS) $(FINAL_LDFLAGS) -Xlinker --defsym=BIN_CRC=0 -Xlinker --defsym=BIN_SIZE=0 --output $(basename $@).tmp_pre
 
 # Create extended listing file from ELF output file
 #

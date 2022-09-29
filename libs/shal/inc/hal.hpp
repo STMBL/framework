@@ -18,8 +18,8 @@ class hal_comp{
 template<uint32_t slots, uint32_t funcs>
 class hal_t{
   public:
-    hal_ctx_t* ctx;
     uint64_t hal_ticks;
+    hal_ctx_t* ctx;
     int32_t start_time = 0;
     int32_t stop_time = 0;
 
