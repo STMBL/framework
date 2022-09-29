@@ -129,9 +129,6 @@ include ../../framework/libs/libs.mak
 
 generate: $(GENINCS) $(GENSOURCES)
 
-format:
-	find $(SOURCES) $(INC) -iname '*.h' -o -iname '*.c' | xargs clang-format -i
-
 # Target: clean project
 #
 clean:
@@ -288,6 +285,14 @@ flash: build/fw.bin
 # TODO: consolidate these two rules into a wildcard version?
 build/fw.dfu: $(FRAMEWORK_DIR)/tools/dfu-convert.py build/fw.bin
 	$(PYTHON) $(FRAMEWORK_DIR)/tools/dfu-convert.py -b $(ADDRESS):build/fw.bin build/fw.dfu
+
+format: $(SOURCES) $(SRC_COMPS)
+	@echo formating code $?
+	@clang-format --style=file -i $?
+
+#format:
+#	find $(SOURCES) $(INC) -iname '*.h' -o -iname '*.c' | xargs clang-format -i
+
 
 include ../../framework/toolchain.mak
 -include ../../framework/toolchain-user.mak
