@@ -45,6 +45,7 @@ CPPFLAGS += -Wdouble-promotion
 CPPFLAGS += -Wundef
 CPPFLAGS += -nodefaultlibs
 CPPFLAGS += -nostdlib
+CPPFLAGS += -nolibc
 CPPFLAGS += -fno-common
 CPPFLAGS += -fno-builtin
 CPPFLAGS += -nostartfiles
@@ -65,6 +66,7 @@ CFLAGS += -std=gnu11
 #---------------- C++ Compiler Options ----------------
 #
 CXXFLAGS += $(OPT)
+CXXFLAGS += -nostdinc++
 CXXFLAGS += -std=c++20
 CXXFLAGS += -fno-rtti 
 CXXFLAGS += -fno-exceptions
