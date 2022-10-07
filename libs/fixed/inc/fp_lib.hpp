@@ -363,7 +363,7 @@ constexpr bool operator== (fixed<b> left, fixed<b> right){
 
 template<uint8_t b>
 constexpr bool operator== (fixed<b> left, int right){
-  return(left.data == fixed<b>(right));
+  return(left == fixed<b>(right));
 }
 
 template<uint8_t b>
@@ -541,7 +541,10 @@ constexpr fixed<bl> LIMIT(const fixed<bl>x, const int lowhigh){
 template<uint8_t bl, uint8_t bm, uint8_t br>
 constexpr q8_24 SCALE(const fixed<bl>x, const fixed<bm>low, const fixed<br>high){
   fixed<br> delta = high - low;
-  fixed<bl>tx = x - low;
+  if(delta == 0){
+    return(0);
+  }
+  fixed<bl> tx = x - low;
   q8_24 r = tx / delta;
   r = CLAMP(r, 0, 1);
 
