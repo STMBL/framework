@@ -9,6 +9,6 @@ ifneq (,$(findstring shal, $(LIBS)))
 endif
 
 build/gen/inc/hal_pins.hpp: $(SRC_COMPS)
-	@echo Generating hal pin H: $<
+	@echo Generating hal pin H: $@
 	@$(MKDIR) -p $(dir $@)
 	@$(PYTHON) $(LIBPATH)/tools/create_hal_pin_h.py $@ $(SRC_COMPS)

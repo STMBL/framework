@@ -12,7 +12,21 @@ class fifo_t{
     uint32_t temp_read_ptr = 0;
 
   public:
-    int push(uint8_t d){
+    int push(auto d){
+      uint8_t *ptr = &d;
+      uint32_t len = sizeof(d);
+
+      uint32_t ret = 0;
+      uint32_t cnt = 0;
+
+      do{
+        ret = _push(ptr[cnt++]);
+      } while(cnt < len && ret == 1);
+
+      return(ret);
+    }
+
+    int _push(uint8_t d){
       if((write_ptr + 1) % count != read_ptr){
         data[write_ptr++] = d;
         write_ptr %= count;
