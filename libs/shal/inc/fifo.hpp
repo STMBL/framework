@@ -7,9 +7,9 @@ template<uint32_t count>
 class fifo_t{
   private:
     uint8_t data[count];
-    uint32_t read_ptr = 0;
-    uint32_t write_ptr = 0;
-    uint32_t temp_read_ptr = 0;
+    uint32_t read_ptr = 0; // next index to read
+    uint32_t write_ptr = 0; // next index to write
+    uint32_t temp_read_ptr = 0; 
 
   public:
     int push(auto d){
@@ -42,15 +42,25 @@ class fifo_t{
       return(r);
     }
 
-    uint32_t free(){
+    void skip(uint32_t i){
+      read_ptr += i;
+      read_ptr %= count;
+      temp_read_ptr = read_ptr;
+    }
+
+    uint32_t free(){ // space left
       return(count - (write_ptr + count - read_ptr) % count);
     }
 
-    uint32_t size(){
+    uint32_t size(){ // all space
       return(count);
     }
 
-    uint8_t* read(){
+    uint32_t available(){
+      return(size() - free());
+    }
+
+    uint8_t* read(){ // get read ptr
       return(data + read_ptr);
     }
 
@@ -71,7 +81,7 @@ class fifo_t{
       read_ptr = temp_read_ptr;
     }
 
-    uint32_t todo(){
+    uint32_t todo(){ // stuff to read
       if(read_ptr == temp_read_ptr){
         if(read_ptr != write_ptr){
           return(1);
@@ -80,12 +90,32 @@ class fifo_t{
       return(0);
     }
 
-    uint8_t* write(){
+    uint8_t* write(){ // get write ptr
       return(data + write_ptr);
     }
 
     void set_write_ptr(uint32_t ptr){
       write_ptr = ptr;
       write_ptr %= count;
+    }
+
+    template<uint32_t B>
+    uint32_t get(uint32_t i) const {
+      union{
+        uint32_t ret;
+        int8_t bytes[4];
+      };
+      for(int i = 0; i < B; i++){
+        bytes[i] = (*this)[i];
+      }
+      return(ret);
+    }
+
+    uint8_t operator [] (uint32_t i) const {
+      return(data[i]);
+    }
+
+    uint8_t& operator [] (uint32_t i) {
+      return(data[i]);
     }
 };
