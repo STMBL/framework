@@ -1,4 +1,5 @@
 import sys
+import re
 
 def name_hash(s, l):
   r = 0
@@ -8,6 +9,8 @@ def name_hash(s, l):
       r += ord(s[i])
   return r
 
+signal_pattern = "ctx->[a-zA-Z_]+[.][a-zA-Z_]+"
+
 comps = {}
 pin_count = 0
 cmd_count = 0
@@ -16,6 +19,7 @@ q_types = ["Q8_24", "Q16_16", "Q24_8", "C8_24", "C16_16", "C24_8", "INT32_T", "U
 
 for file in sys.argv[2:]:
   print("\033[92m" + "parse file: " + file + "\033[0m")
+  api = []
   with open(file) as f: # TODO raise error if file cannot be opened instead of silently succeeding
     for line in f:
       if line.lstrip()[0:8] == "HAL_PIN(":
@@ -28,6 +32,11 @@ for file in sys.argv[2:]:
 
         type, name, *entries = signal.split(" ")
         comp, pin = name.split(".")
+
+        if name not in api:
+          api.append(name)
+        else:
+          print("\033[31m" + "multiple definitions of signal: " + name + "\033[0m")
        
         if not comp in comps:
           comps[comp] = {}
@@ -42,11 +51,15 @@ for file in sys.argv[2:]:
 
         else:
           if comps[comp][pin][0] != type:
-            print("\033[91m" + "type mismatch: " + name + "\033[0m")
+            print("\033[31m" + "type mismatch: " + name + "\033[0m")
           if comps[comp][pin][1] == "":
             comps[comp][pin] = (type, comment) # update empty comment
           elif comment != "" and comps[comp][pin][1] != comment:
-            print("\033[91m" + "comment mismatch: " + name + "\033[0m")
+            print("\033[93m" + "comment mismatch: " + name + "\033[0m")
+      for sig in re.findall(signal_pattern, line):
+        if sig[5:] not in api:
+          print("\033[93m" + "missing definition of signal: " + sig[5:] + "\033[0m")
+          api.append(sig[5:])
 
 header = open(sys.argv[1], 'w')
 header.write("#include \"fp_lib.hpp\"\n")
