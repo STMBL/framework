@@ -41,8 +41,8 @@ TEMPLATE_TEST_CASE("mehrere", "blupp", q8_24, q16_16, q24_8){
         REQUIRE( TestType(foo + bar) == TestType(4.0));
     }
     SECTION("division"){
-        REQUIRE( TestType(foobar)/2 == TestType(1.5));
-        REQUIRE( TestType(foobar)/3 == TestType(1.0));
+        REQUIRE( TestType(TestType(foobar)/2) == TestType(1.5));
+        REQUIRE( TestType(TestType(foobar)/3) == TestType(1.0));
     }
     SECTION("multiplication"){
         REQUIRE( static_cast<TestType>(TestType(foo)*TestType(1.0)) == TestType(1.5));

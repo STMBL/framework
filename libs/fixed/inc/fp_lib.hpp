@@ -14,8 +14,9 @@ class fixed{
     static const uint8_t fbits = b;
     int32_t data;
 
+    // explicit cast fixed -> fixed
     template<uint8_t bl>
-    constexpr operator fixed<bl>() {
+    explicit constexpr operator fixed<bl>() {
         fixed<bl> r;
         if(fbits > bl){ // check >> with negative numbers, change to / (1 << fbits)
             r.data = data >> (fbits - bl);
@@ -26,32 +27,24 @@ class fixed{
         return(r);
     }
 
+    // explicit cast fixed -> int32
     explicit constexpr operator int32_t() {
         return(data >> fbits);
     }
 
     #ifdef FP_USE_FLOAT
+    // explicit cast fixed -> float
     explicit constexpr operator float() {
         return (static_cast<float>(data) / static_cast<float>(1 << fbits));
     }
 
+    // explicit cast fixed -> double
     explicit constexpr operator double() {
         return (static_cast<double>(data) / static_cast<double>(1 << fbits));
     }
     #endif
 
-    // constexpr operator int32_t(){  
-    //     int32_t r;
-    //     r = data >> fbits;
-    // return(r);
-    // }
-
-    // constexpr int32_t intcast(){
-    //     int32_t r;
-    //     r = data >> fbits;
-    // return(r);
-    // }
-
+    // return integral part of fixed
     constexpr fixed<b> integral() {
         fixed<b> r;
         if(data >= 0){
@@ -65,6 +58,7 @@ class fixed{
         return(r);
     }
 
+    // return fractional part of fixed
     constexpr fixed<b> fractional() {
         fixed<b> r;
         if(data >= 0){
@@ -83,16 +77,19 @@ class fixed{
     //     return(r);
     // }
 
+    // pre increment
     constexpr fixed<b>& operator ++() {
         data += (1 << b);
         return(*this);
     }
 
+    // pre decrement
     constexpr fixed<b>& operator --() {
         data -= (1 << b);
         return(*this);
     }
 
+    // post increment
     constexpr fixed<b> operator ++(int) {
         fixed<b> r;
         r.data = data;
@@ -100,6 +97,7 @@ class fixed{
         return(r);
     }
 
+    // post decrement
     constexpr fixed<b> operator --(int) {
         fixed<b> r;
         r.data = data;
@@ -113,12 +111,14 @@ class fixed{
       r.data = 1;
       return(r);
     }
+
     //largest number of type
     constexpr static fixed<b> max(){
       fixed<b> r;
       r.data = 0x7fffffff;
       return(r);
     }
+
     //smallest number of type
     constexpr static fixed<b> min(){
       fixed<b> r;
@@ -126,6 +126,7 @@ class fixed{
       return(r);
     }
 
+    // constructors
     fixed() = default;
     fixed(int v) : data (v * (1 << fbits)) {}
     fixed(unsigned int v) : data (v * (1 << fbits)) {}
@@ -135,12 +136,14 @@ class fixed{
     fixed(double v) : data (v * (1 << fbits)) {}
 };
 
+// temporary type, result of a fixed calculation
 class tfixed{
     public:
     int64_t data;
     uint8_t fbits;
     uint8_t ibits;
 
+    // cast to fixed
     template<uint8_t b>
     constexpr operator fixed<b>() {
         fixed<b> r;
@@ -153,11 +156,25 @@ class tfixed{
         return(r);
     }
 
+    // explicit cast to int32
     explicit constexpr operator int32_t() {
         return(data >> fbits);
     }
+
+    #ifdef FP_USE_FLOAT
+    // explicit cast fixed -> float
+    explicit constexpr operator float() {
+        return (static_cast<float>(data) / static_cast<float>(1 << fbits));
+    }
+
+    // explicit cast fixed -> double
+    explicit constexpr operator double() {
+        return (static_cast<double>(data) / static_cast<double>(1 << fbits));
+    }
+    #endif
 };
 
+// -fixed
 template<uint8_t bl>
 constexpr fixed<bl> operator -(fixed<bl> right) {
     fixed<bl> r;
@@ -165,34 +182,80 @@ constexpr fixed<bl> operator -(fixed<bl> right) {
     return(r);
 }
 
+// fixed * int32
 template<uint8_t bl>
-constexpr fixed<bl> operator *(fixed<bl> left, int32_t right) {
-    fixed<bl> r;
+constexpr tfixed operator *(fixed<bl> left, int32_t right) {
+    tfixed r;
+    r.fbits = bl;
     r.data = left.data * right;
     return(r);
 }
 
+// fixed / int32
 template<uint8_t bl>
-constexpr fixed<bl> operator /(fixed<bl> left, int32_t right) {
-    fixed<bl> r;
+constexpr tfixed operator /(fixed<bl> left, int32_t right) {
+    tfixed r;
+    r.fbits = bl;
     r.data = left.data / right;
     return(r);
 }
 
+// fixed + int32
 template<uint8_t bl>
-constexpr fixed<bl> operator +(fixed<bl> left, int32_t right) {
-    fixed<bl> r;
+constexpr tfixed operator +(fixed<bl> left, int32_t right) {
+    tfixed r;
+    r.fbits = bl;
     r.data = left.data + (right << bl);
     return(r);
 }
 
+// fixed - int32
 template<uint8_t bl>
-constexpr fixed<bl> operator -(fixed<bl> left, int32_t right) {
-    fixed<bl> r;
+constexpr tfixed operator -(fixed<bl> left, int32_t right) {
+    tfixed r;
+    r.fbits = bl;
     r.data = left.data - (right << bl);
     return(r);
 }
 
+// int32 * fixed
+template<uint8_t br>
+constexpr tfixed operator *(int32_t left, fixed<br> right) {
+    tfixed r;
+    r.fbits = br;
+    r.data = left * right.data;
+    return(r);
+}
+
+// int32 / fixed
+template<uint8_t br>
+tfixed operator /(const int32_t left, const fixed<br> right){
+    tfixed r;
+    r.fbits = br;
+    r = fixed<br>(left) / right;
+    return(r);
+}
+
+// int32 + fixed
+template<uint8_t br>
+constexpr tfixed operator +(int32_t left, fixed<br> right) {
+    tfixed r;
+    r.fbits = br;
+    r.data = (left << br) + right.data;
+    return(r);
+}
+
+// int32 - fixed
+template<uint8_t br>
+constexpr tfixed operator -(int32_t left, fixed<br> right) {
+    tfixed r;
+    r.fbits = br;
+    r.data = (left << br) - right.data;
+    return(r);
+}
+
+
+// fixed * fixed
 template<uint8_t bl, uint8_t br>
 constexpr tfixed operator *(fixed<bl> left, fixed<br> right) {
     tfixed r;
@@ -202,7 +265,7 @@ constexpr tfixed operator *(fixed<bl> left, fixed<br> right) {
     return(r);
 }
 
-
+// fixed / fixed
 #if defined FP_USE_64Bit_DIV
 template<uint8_t bl, uint8_t br>
 constexpr tfixed operator /(fixed<bl> left, fixed<br> right) {
@@ -233,12 +296,7 @@ constexpr tfixed operator /(fixed<bl> left, fixed<br> right) {
 }
 #endif
 
-template<uint8_t br>
-fixed<br> operator /(const int32_t left, const fixed<br> right){
-    fixed<br>r = fixed<br>(left) / right;
-    return(r);
-}
-
+// fixed + fixed
 template<uint8_t bl, uint8_t br>
 constexpr tfixed operator +(fixed<bl> left, fixed<br> right) {
     tfixed r;
@@ -263,6 +321,7 @@ constexpr tfixed operator +(fixed<bl> left, fixed<br> right) {
     return(r);
 }
 
+// fixed - fixed
 template<uint8_t bl, uint8_t br>
 constexpr tfixed operator -(fixed<bl> left, fixed<br> right) {
     tfixed r;
@@ -287,48 +346,56 @@ constexpr tfixed operator -(fixed<bl> left, fixed<br> right) {
     return(l);
 }
 
+// fixed *= fixed
 template<uint8_t bl, uint8_t br>
 fixed<bl>& operator *=(fixed<bl>& left, const fixed<br>& right){
     left = left * right;
     return(left);
 }
 
+// fixed *= int32
 template<uint8_t bl>
 fixed<bl>& operator *=(fixed<bl>& left, const int32_t& right){
     left = left * right;
     return(left);
 }
 
+// fixed /= fixed
 template<uint8_t bl, uint8_t br>
 fixed<bl>& operator /=(fixed<bl>& left, const fixed<br>& right){
     left = left / right;
     return(left);
 }
 
+// fixed /= int32
 template<uint8_t bl>
 fixed<bl>& operator /=(fixed<bl>& left, const int32_t& right){
     left = left / right;
     return(left);
 }
 
+// fixed += fixed
 template<uint8_t bl, uint8_t br>
 fixed<bl>& operator +=(fixed<bl>& left, const fixed<br>& right){
     left = left + right;
     return(left);
 }
 
+// fixed += int32
 template<uint8_t bl>
 fixed<bl>& operator +=(fixed<bl>& left, const int32_t& right){
     left = left + right;
     return(left);
 }
 
+// fixed -= fixed
 template<uint8_t bl, uint8_t br>
 fixed<bl>& operator -=(fixed<bl>& left, const fixed<br>& right){
     left = left - right;
     return(left);
 }
 
+// fixed -= int32
 template<uint8_t bl>
 fixed<bl>& operator -=(fixed<bl>& left, const int32_t& right){
     left = left - right;
@@ -355,22 +422,25 @@ fixed<bl>& operator -=(fixed<bl>& left, const int32_t& right){
 //   return(l.data > r.data);
 // }
 
+// fixed == fixed
 template<uint8_t b>
 constexpr bool operator== (fixed<b> left, fixed<b> right){
   return(left.data == right.data);
 }
 
-
+// fixed == int32
 template<uint8_t b>
-constexpr bool operator== (fixed<b> left, int right){
+constexpr bool operator== (fixed<b> left, int32_t right){
   return(left == fixed<b>(right));
 }
 
+// int32 == fixed
 template<uint8_t b>
-constexpr bool operator== (int left, fixed<b> right){
+constexpr bool operator== (int32_t left, fixed<b> right){
   return(fixed<b>(left) == right);
 }
 
+// fixed < fixed
 template<uint8_t bl, uint8_t br>
 constexpr bool operator< (fixed<bl> left, fixed<br> right){
   int64_t l, r;
@@ -394,39 +464,47 @@ constexpr bool operator< (fixed<bl> left, fixed<br> right){
   return(l < r);
 }
 
+// fixed > fixed
 template<uint8_t bl, uint8_t br>
 constexpr bool operator> (fixed<bl> left, fixed<br> right){
   return(right < left);
 }
 
+// fixed < int32
 template<uint8_t bl>
-constexpr bool operator< (fixed<bl> left, int right){
+constexpr bool operator< (fixed<bl> left, int32_t right){
   return(left < fixed<bl>(right));
 }
 
+// fixed > int32
 template<uint8_t bl>
-constexpr bool operator> (fixed<bl> left, int right){
+constexpr bool operator> (fixed<bl> left, int32_t right){
   return(left > fixed<bl>(right));
 }
 
+// int32 < fixed
 template<uint8_t br>
-constexpr bool operator< (int left, fixed<br> right){
+constexpr bool operator< (int32_t left, fixed<br> right){
   return(right > fixed<br>(left));
 }
 
+// int32 > fixed
 template<uint8_t br>
-constexpr bool operator> (int left, fixed<br> right){
+constexpr bool operator> (int32_t left, fixed<br> right){
   return(right < fixed<br>(left));
 }
 
+// cos(fixed)
 fixed<16> cosfp(fixed<16> v);
 
+// sin(fixed)
 inline fixed<16> sinfp(fixed<16> v){
   const fixed<16> p = 0.25;
   return(cosfp(v - p));
 }
 
 #ifdef FP_USE_IOSTREAM
+// ostream << fixed
 template<uint8_t b>
 std::ostream& operator<<(std::ostream& os, const fixed<b>& p)
 {
@@ -442,6 +520,7 @@ std::ostream& operator<<(std::ostream& os, const fixed<b>& p)
 }
 #endif
 
+// default types
 typedef fixed<24> q8_24;
 typedef fixed<16> q16_16;
 typedef fixed<8> q24_8;
@@ -557,14 +636,6 @@ constexpr auto ABS(auto x){
   }
   return(x);
 }
-
-// template<uint8_t b>
-// constexpr auto ABS(const fixed<b>x){
-//   if(x < fixed<b>(0)){
-//     return(-x);
-//   }
-//   return(x);
-// }
 
 template<uint8_t b>
 constexpr auto SIGN(const fixed<b>x){
