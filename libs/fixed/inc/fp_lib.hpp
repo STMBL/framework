@@ -187,7 +187,8 @@ template<uint8_t bl>
 constexpr tfixed operator *(fixed<bl> left, int32_t right) {
     tfixed r;
     r.fbits = bl;
-    r.data = left.data * right;
+    r.data = left.data;
+    r.data *= right;
     return(r);
 }
 
@@ -205,7 +206,8 @@ template<uint8_t bl>
 constexpr tfixed operator +(fixed<bl> left, int32_t right) {
     tfixed r;
     r.fbits = bl;
-    r.data = left.data + (right << bl);
+    r.data = left.data;
+    r.data += (right << bl);
     return(r);
 }
 
@@ -214,7 +216,8 @@ template<uint8_t bl>
 constexpr tfixed operator -(fixed<bl> left, int32_t right) {
     tfixed r;
     r.fbits = bl;
-    r.data = left.data - (right << bl);
+    r.data = left.data;
+    r.data -= (right << bl);
     return(r);
 }
 
@@ -223,7 +226,8 @@ template<uint8_t br>
 constexpr tfixed operator *(int32_t left, fixed<br> right) {
     tfixed r;
     r.fbits = br;
-    r.data = left * right.data;
+    r.data = left;
+    r.data *= right.data;
     return(r);
 }
 
@@ -241,7 +245,8 @@ template<uint8_t br>
 constexpr tfixed operator +(int32_t left, fixed<br> right) {
     tfixed r;
     r.fbits = br;
-    r.data = (left << br) + right.data;
+    r.data = (left << br);
+    r.data += right.data;
     return(r);
 }
 
@@ -250,7 +255,8 @@ template<uint8_t br>
 constexpr tfixed operator -(int32_t left, fixed<br> right) {
     tfixed r;
     r.fbits = br;
-    r.data = (left << br) - right.data;
+    r.data = (left << br);
+    r.data -= right.data;
     return(r);
 }
 
