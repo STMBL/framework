@@ -4,6 +4,7 @@ PYTHON     = python3
 DFU-UTIL   = dfu-util
 DFU-SUFFIX = dfu-suffix
 ST-FLASH   = st-flash
+J-FLASH    = jlink
 TOOLCHAIN  = arm-none-eabi-
 CC         = $(TOOLCHAIN)gcc
 CXX        = $(TOOLCHAIN)g++
