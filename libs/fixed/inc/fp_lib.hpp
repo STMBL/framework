@@ -624,13 +624,13 @@ constexpr fixed<bl> LIMIT(const fixed<bl>x, const int lowhigh){
 }
 
 template<uint8_t bl, uint8_t bm, uint8_t br>
-constexpr q8_24 SCALE(const fixed<bl>x, const fixed<bm>low, const fixed<br>high){
+constexpr q16_16 SCALE(const fixed<bl>x, const fixed<bm>low, const fixed<br>high){
   fixed<br> delta = high - low;
   if(delta == 0){
     return(0);
   }
   fixed<bl> tx = x - low;
-  q8_24 r = tx / delta;
+  q16_16 r = tx / delta;
   r = CLAMP(r, 0, 1);
 
   return(r);
