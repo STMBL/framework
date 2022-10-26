@@ -136,6 +136,40 @@ class fixed{
     fixed(double v) : data (v * (1 << fbits)) {}
 };
 
+
+class _sat_{
+  public:
+    int64_t data;
+    uint8_t fbits;
+
+    _sat_(int64_t data, uint8_t fbits) {
+      this->data = data;
+      this->fbits = fbits;
+    }
+
+    template<uint8_t b>
+    constexpr operator fixed<b>() {
+      fixed<b> r;
+        int64_t temp;
+
+        if(fbits > b){ // check >> with negative numbers, change to / (1 << fbits)
+            temp = data >> (fbits - b);
+        }
+        else{
+            temp = data << (b - fbits);
+        }
+
+        r.data = temp;
+        if(r.data < temp){
+          r = r.max();
+        }
+        if(r.data > temp){
+          r = r.min();
+        }
+        return(r);
+    }
+};
+
 // temporary type, result of a fixed calculation
 class tfixed{
     public:
@@ -154,6 +188,11 @@ class tfixed{
             r.data = data << (b - fbits);
         }
         return(r);
+    }
+
+    auto sat(){
+      _sat_ r = _sat_(data, fbits);
+      return(r);
     }
 
     // explicit cast to int32
@@ -625,12 +664,12 @@ constexpr fixed<bl> LIMIT(const fixed<bl>x, const int lowhigh){
 
 template<uint8_t bl, uint8_t bm, uint8_t br>
 constexpr q16_16 SCALE(const fixed<bl>x, const fixed<bm>low, const fixed<br>high){
-  fixed<br> delta = high - low;
+  fixed<MIN(bm, br)> delta = (high - low).sat();
   if(delta == 0){
     return(0);
   }
-  fixed<bl> tx = x - low;
-  q16_16 r = tx / delta;
+  fixed<MIN(bl, bm)> tx = (x - low).sat();
+  q16_16 r = (tx / delta).sat();
   r = CLAMP(r, 0, 1);
 
   return(r);
