@@ -1,6 +1,5 @@
 
 #include <stdint.h>
-#include "stm32f1xx.h"
 #include <fp_lib.hpp>
 #include "hal_pins.hpp"
 
@@ -20,21 +19,19 @@ class hal_t{
   public:
     uint64_t hal_ticks;
     hal_ctx_t* ctx;
-    int32_t start_time = 0;
-    int32_t stop_time = 0;
+
+    volatile uint32_t * tim_ptr;
 
     void run_rt(){
       hal_ticks++;
-
   
       for(uint32_t i = 0; i < funcs; i++){
         if(comps[hal_slot][i]){
-          start_time = TIM1->CNT;
+          int32_t start_time = *tim_ptr;
           comps[hal_slot][i]->rt(ctx, hal_slot);
-          stop_time = TIM1->CNT;
+          int32_t stop_time = *tim_ptr;
           int32_t diff = stop_time - start_time;
           diff = ABS(diff);
-
           comps[hal_slot][i]->time = diff;
           comps[hal_slot][i]->max_time = MAX(comps[hal_slot][i]->max_time, diff);
         }
@@ -61,6 +58,8 @@ class hal_t{
       for(uint32_t slot = 0; slot < slots; slot++){
         for(uint32_t comp = 0; comp < funcs; comp++){
           if(comps[slot][comp]){
+            comps[slot][comp]->time = 0;
+            comps[slot][comp]->max_time = 0;
             comps[slot][comp]->init(ctx);
           }
         }
