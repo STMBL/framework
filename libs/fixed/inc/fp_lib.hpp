@@ -14,14 +14,27 @@ class fixed{
     static const uint8_t fbits = b;
     int32_t data;
 
+    template<uint8_t bl>
+    constexpr static fixed<b> sat(fixed<bl> l){
+      fixed<b> r = fixed<b>(l);
+      if(l > r.max()){
+        r = r.max();
+      }
+      if(l < r.min()){
+        r = r.min();
+      }
+      return(r);
+    }
+
     // explicit cast fixed -> fixed
     template<uint8_t bl>
     explicit constexpr operator fixed<bl>() {
         fixed<bl> r;
-        if(fbits > bl){ // check >> with negative numbers, change to / (1 << fbits)
+        if(fbits > bl){ // TODO: check >> with negative numbers, change to / (1 << fbits)
             r.data = data >> (fbits - bl);
         }
         else{
+            // TODO: auto sat for smaller target range
             r.data = data << (bl - fbits);
         }
         return(r);
@@ -152,10 +165,11 @@ class _sat_{
       fixed<b> r;
         int64_t temp;
 
-        if(fbits > b){ // check >> with negative numbers, change to / (1 << fbits)
+        if(fbits > b){ // TODO: check >> with negative numbers, change to / (1 << fbits)
             temp = data >> (fbits - b);
         }
         else{
+            // TODO: auto sat for smaller target range
             temp = data << (b - fbits);
         }
 
@@ -181,10 +195,11 @@ class tfixed{
     template<uint8_t b>
     constexpr operator fixed<b>() {
         fixed<b> r;
-        if(fbits > b){ // check >> with negative numbers, change to / (1 << fbits)
+        if(fbits > b){ // TODO: check >> with negative numbers, change to / (1 << fbits)
             r.data = data >> (fbits - b);
         }
         else{
+          // TODO: auto sat for smaller target range
             r.data = data << (b - fbits);
         }
         return(r);
@@ -570,6 +585,20 @@ typedef fixed<24> q8_24;
 typedef fixed<16> q16_16;
 typedef fixed<8> q24_8;
 
+constexpr int MAX(const int l, const int r){
+  if(l > r){
+    return(l);
+  }
+  return(r);
+}
+
+constexpr int MIN(const int l, const int r){
+  if(l < r){
+    return(l);
+  }
+  return(r);
+}
+
 template<uint8_t b>
 constexpr auto MAX(const fixed<b> l, const fixed<b> r){
   if(l > r){
@@ -604,20 +633,6 @@ constexpr auto MAX(const int l, const fixed<b> r){
 template<uint8_t b>
 constexpr auto MIN(const int l, const fixed<b> r){
   return(MIN(fixed<b>(l), r));
-}
-
-constexpr int MAX(const int l, const int r){
-  if(l > r){
-    return(l);
-  }
-  return(r);
-}
-
-constexpr int MIN(const int l, const int r){
-  if(l < r){
-    return(l);
-  }
-  return(r);
 }
 
 constexpr auto MAX3(const auto l, const auto m, const auto r){
