@@ -15,7 +15,7 @@ comps = {}
 pin_count = 0
 cmd_count = 0
 
-q_types = ["Q8_24", "Q16_16", "Q24_8", "C8_24", "C16_16", "C24_8", "INT32_T", "UINT32_T", "ENUM", "FIFO"]
+q_types = ["Q0_32", "Q8_24", "Q16_16", "Q24_8", "C0_32", "C8_24", "C16_16", "C24_8", "INT32_T", "UINT32_T", "ENUM", "FIFO"]
 
 for file in sys.argv[2:]:
   print("\033[92m" + "parse file: " + file + "\033[0m")

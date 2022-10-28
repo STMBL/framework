@@ -581,6 +581,7 @@ std::ostream& operator<<(std::ostream& os, const fixed<b>& p)
 #endif
 
 // default types
+typedef fixed<32> q0_32;
 typedef fixed<24> q8_24;
 typedef fixed<16> q16_16;
 typedef fixed<8> q24_8;
@@ -599,16 +600,20 @@ constexpr int MIN(const int l, const int r){
   return(r);
 }
 
+//template<uint8_t bl, uint8_t br>
+//constexpr fixed<MIN(bl, br)> MAX(const fixed<bl> l, const fixed<br> r){
 template<uint8_t b>
-constexpr auto MAX(const fixed<b> l, const fixed<b> r){
+constexpr fixed<b> MAX(const fixed<b> l, const fixed<b> r){  
   if(l > r){
     return(l);
   }
   return(r);
 }
 
+//template<uint8_t bl, uint8_t br>
+//constexpr fixed<MAX(bl, br)> MIN(const fixed<bl> l, const fixed<br> r){
 template<uint8_t b>
-constexpr auto MIN(const fixed<b> l, const fixed<b> r){
+constexpr fixed<b> MIN(const fixed<b> l, const fixed<b> r){  
   if(l < r){
     return(l);
   }
@@ -649,7 +654,7 @@ constexpr int CLAMP(const int x, const int low, const int high){
 
 template<uint8_t bl, uint8_t bm, uint8_t br>
 constexpr fixed<bl> CLAMP(const fixed<bl>x, const fixed<bm>low, const fixed<br>high){
-  return(MIN(MAX(x, low), high));
+  return(fixed<bl>(MIN(MAX(x, low), high)));
 }
 
 template<uint8_t bl, uint8_t bm>
