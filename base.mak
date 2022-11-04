@@ -13,8 +13,9 @@ INCDIRS += inc/
 
 INCDIRS += build/gen/inc/
 
-CPPFLAGS += -D$(CPUDEF)
-CPPFLAGS += -DHSE_VALUE=$(XTAL_FREQ)
+DEFINES += -D$(CPUDEF)
+DEFINES += -DHSE_VALUE=$(XTAL_FREQ)
+CPPFLAGS += $(DEFINES)
 
 
 #============================================================================
@@ -156,14 +157,14 @@ USR := $(shell whoami)
 HOST := $(shell hostname)
 CRC = 0#$(shell crc32 $(basename $@).bin)
 BIN_SIZE = $(strip $(shell wc -c < $(basename $@).bin))
-CPPFLAGS += -DGIT_HASH=$(GIT_HASH)
-CPPFLAGS += -DGIT_BRANCH=$(GIT_BRANCH)
-CPPFLAGS += -DUSR=$(USR)
-CPPFLAGS += -DHOST=$(HOST)
-CPPFLAGS += -DBUILD_CC_VERSION=$(shell $(CC) -dumpversion)
-CPPFLAGS += -DBUILD_CC=$(CC)
+DEFINES += -DGIT_HASH=$(GIT_HASH)
+DEFINES += -DGIT_BRANCH=$(GIT_BRANCH)
+DEFINES += -DUSR=$(USR)
+DEFINES += -DHOST=$(HOST)
+DEFINES += -DBUILD_CC_VERSION=$(shell $(CC) -dumpversion)
+DEFINES += -DBUILD_CC=$(CC)
 ifdef XTAL_FREQ
-	CFLAGS += -DHSE_VALUE=$(XTAL_FREQ)
+	DEFINES += -DHSE_VALUE=$(XTAL_FREQ)
 endif
 
 # Link: create ELF output file from object files
@@ -299,7 +300,7 @@ format: $(SOURCES) $(SRC_COMPS)
 
 tidy: generate
 	@echo tidy checks
-	$(Q)$(TIDY) $(GENSOURCES) $(SOURCES) -checks=* -- $(addprefix -I,$(INCDIRS)) -D$(CPUDEF) 
+	$(Q)$(TIDY) $(GENSOURCES) $(SOURCES) -extra-arg=-std=c++20 -checks=*,-readability-identifier-length,-llvmlibc-implementation-in-namespace,-llvmlibc-callee-namespace,-google-readability-casting,-google-readability-todo,-llvm-include-order,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-altera-unroll-loops,-performance-no-int-to-ptr,-cppcoreguidelines-pro-type-cstyle-cast,-cppcoreguidelines-avoid-c-arrays,-hicpp-avoid-c-arrays,-modernize-avoid-c-arrays,-altera-id-dependent-backward-branch,-modernize-use-trailing-return-type,-hicpp-signed-bitwise,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp,-bugprone-easily-swappable-parameters,-misc-unused-parameters,-cppcoreguidelines-avoid-non-const-global-variables,-fuchsia-statically-constructed-objects,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic -- $(addprefix -I,$(INCDIRS)) $(DEFINES) 
 
 #format:
 #	find $(SOURCES) $(INC) -iname '*.h' -o -iname '*.c' | xargs clang-format -i
