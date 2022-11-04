@@ -54,6 +54,7 @@ CPPFLAGS += -Wpadded
 CPPFLAGS += -Wunreachable-code
 CPPFLAGS += -Wextra
 CPPFLAGS += -Wno-unused-parameter
+CPPFLAGS += -Wconversion
 
 #---------------- C Compiler Options ----------------
 #
@@ -296,9 +297,12 @@ format: $(SOURCES) $(SRC_COMPS)
 	@echo formating code $?
 	@clang-format --style=file -i $?
 
+tidy: generate
+	@echo tidy checks
+	$(Q)$(TIDY) $(GENSOURCES) $(SOURCES) -checks=* -- $(addprefix -I,$(INCDIRS)) -D$(CPUDEF) 
+
 #format:
 #	find $(SOURCES) $(INC) -iname '*.h' -o -iname '*.c' | xargs clang-format -i
-
 
 include ../../framework/toolchain.mak
 -include ../../framework/toolchain-user.mak

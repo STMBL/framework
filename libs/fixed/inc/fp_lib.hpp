@@ -141,12 +141,12 @@ class fixed{
 
     // constructors
     fixed() = default;
-    fixed(int v) : data (v * (1 << fbits)) {}
-    fixed(unsigned int v) : data (v * (1 << fbits)) {}
-    fixed(long int v) : data (v * (1 << fbits)) {}
-    fixed(unsigned long int v) : data (v * (1 << fbits)) {} 
-    fixed(float v) : data (v * (1 << fbits)) {}
-    fixed(double v) : data (v * (1 << fbits)) {}
+    fixed(int v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
+    fixed(unsigned int v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
+    fixed(long int v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
+    fixed(unsigned long int v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {} 
+    fixed(float v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
+    fixed(double v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
 };
 
 
@@ -173,7 +173,7 @@ class _sat_{
             temp = data << (b - fbits);
         }
 
-        r.data = temp;
+        r.data = (int32_t)temp;
         if(r.data < temp){
           r = r.max();
         }
@@ -196,11 +196,11 @@ class tfixed{
     constexpr operator fixed<b>() {
         fixed<b> r;
         if(fbits > b){ // TODO: check >> with negative numbers, change to / (1 << fbits)
-            r.data = data >> (fbits - b);
+            r.data = (int32_t)(data >> (fbits - b));
         }
         else{
           // TODO: auto sat for smaller target range
-            r.data = data << (b - fbits);
+            r.data = (int32_t)(data << (b - fbits));
         }
         return(r);
     }
@@ -212,7 +212,7 @@ class tfixed{
 
     // explicit cast to int32
     explicit constexpr operator int32_t() {
-        return(data >> fbits);
+        return((int32_t)(data >> fbits));
     }
 
     #ifdef FP_USE_FLOAT

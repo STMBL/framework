@@ -9,10 +9,10 @@ fixed<16> cosfp(fixed<16> v){ // only fract bits < 0.5
   x -= m;
   x >>= 3;
 
-  const int32_t a = 1 * (1 << 13);
-  const int32_t b = -19.5556 * (1 << 13);
-  const int32_t c = 60.4444 * (1 << 13);
-  const int32_t d = -56.8889 * (1 << 13);
+  const int32_t a = (int32_t)(1 * (1 << 13));
+  const int32_t b = (int32_t)(-19.5556 * (1 << 13));
+  const int32_t c = (int32_t)(60.4444 * (1 << 13));
+  const int32_t d = (int32_t)(-56.8889 * (1 << 13));
 
   int32_t xx = (x * x) >> 13; // f.bits
   int32_t dxx = (d * xx) >> 13; // f.24

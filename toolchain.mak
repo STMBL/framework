@@ -15,3 +15,4 @@ SIZE       = $(TOOLCHAIN)size
 NM         = $(TOOLCHAIN)nm
 MKDIR      = mkdir
 HOSTCXX    = g++
+TIDY		   = clang-tidy
