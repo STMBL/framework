@@ -54,6 +54,7 @@ CPPFLAGS += -Wpadded
 CPPFLAGS += -Wunreachable-code
 CPPFLAGS += -Wextra
 CPPFLAGS += -Wno-unused-parameter
+CPPFLAGS += -Wconversion
 
 #---------------- C Compiler Options ----------------
 #

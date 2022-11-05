@@ -60,14 +60,20 @@ class fixed{
     // return integral part of fixed
     constexpr fixed<b> integral() {
         fixed<b> r;
-        if(data >= 0){
+        if constexpr(b < 32){
+          if(data >= 0){
             r.data = data & (0xffffffff << b);
+          }
+          else{
+              r.data = -data;
+              r.data &= (0xffffffff << b);
+              r.data = -r.data;
+          }
         }
         else{
-            r.data = -data;
-            r.data &= (0xffffffff << b);
-            r.data = -r.data;
+          r.data = 0;
         }
+        
         return(r);
     }
 
@@ -82,6 +88,7 @@ class fixed{
             r.data &= (0xffffffff >> (32 - b));
             r.data = -r.data;
         }
+        
         return(r);
     }
 
@@ -569,6 +576,10 @@ template<uint8_t b>
 std::ostream& operator<<(std::ostream& os, const fixed<b>& p)
 {
     fixed v = p;
+    if(v < 0){
+      v *= -1;
+      os << '-';
+    }
     os << static_cast<const int32_t>(v.integral()) << ".";
     v = ABS(v.fractional());
     do{
