@@ -1,5 +1,5 @@
 
-#include <stdint.h>
+#include <cstdint>
 
 #pragma once 
 

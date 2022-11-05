@@ -1,5 +1,5 @@
 #pragma once
-#include <stdint.h>
+#include <cstdint>
 #ifdef FP_USE_IOSTREAM
 #include <iostream>
 #endif
