@@ -1,5 +1,5 @@
 
-#include <stdint.h>
+#include <cstdint>
 #include <fp_lib.hpp>
 #include "hal_pins.hpp"
 
