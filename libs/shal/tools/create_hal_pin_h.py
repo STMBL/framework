@@ -30,7 +30,13 @@ for file in sys.argv[2:]:
         comment = ")".join(line.split(")")[1:])
         comment = comment.lstrip()
 
-        type, name, *entries = signal.split(" ")
+        if ">" in signal:
+          one, two = signal.split(">")
+          type, name, *entries = two.split(" ")
+          type = one + ">"
+          
+        else:
+          type, name, *entries = signal.split(" ")
         comp, pin = name.split(".")
 
         if name not in api:
@@ -63,6 +69,7 @@ for file in sys.argv[2:]:
 
 header = open(sys.argv[1], 'w')
 header.write("#include \"fp_lib.hpp\"\n")
+header.write("#include \"units.hpp\"\n")
 header.write("#include \"fifo.hpp\"\n")
 header.write("#pragma once\n")
 header.write("\n")
@@ -77,7 +84,7 @@ header.write("\n")
 for comp_name, pins in comps.items():
   header.write("  class " + comp_name + "_t {\n")
   header.write("    public:\n")
-  for pin_name, (type, comment) in pins.items():      
+  for pin_name, (type, comment) in pins.items():
     if type[0:3] == "bit":
       header.write("      struct " + pin_name + "_t {\n")
       for e in type.split(" ")[1:]:
@@ -116,6 +123,9 @@ header.write("    } hal_pins[" + str(pin_count) + "] = {\n")
 
 for comp_name, pins in comps.items():
   for pin_name, (type, comment) in pins.items():
+    if len(type.split("<")) > 1 and len(type.split(">")) > 1:
+      type = type.split("<")[1].split(">")[0].split(",")[0]
+    
     if type[0:4] == "enum":
       header.write("      {\"" + comp_name + "." + pin_name + "\", \"" + comment + "\", (void *)&(" + comp_name + "." + pin_name + "), hal_pin_t::type_t::ENUM},\n")
     elif type[0:3] == "bit":
