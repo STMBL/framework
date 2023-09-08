@@ -147,13 +147,13 @@ class fixed{
     }
 
     // constructors
-    fixed() = default;
-    fixed(int v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
-    fixed(unsigned int v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
-    fixed(long int v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
-    fixed(unsigned long int v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {} 
-    fixed(float v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
-    fixed(double v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
+    constexpr fixed() = default;
+    constexpr fixed(int v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
+    constexpr fixed(unsigned int v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
+    constexpr fixed(long int v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
+    constexpr fixed(unsigned long int v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {} 
+    constexpr fixed(float v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
+    constexpr fixed(double v) : data ((int32_t)(v * (int32_t)(1ll << fbits))) {}
 };
 
 
@@ -592,10 +592,10 @@ std::ostream& operator<<(std::ostream& os, const fixed<b>& p)
 #endif
 
 // default types
-typedef fixed<32> q0_32;
-typedef fixed<24> q8_24;
-typedef fixed<16> q16_16;
-typedef fixed<8> q24_8;
+using q0_32 = fixed<32>;
+using q8_24 = fixed<24>;
+using q16_16 = fixed<16>;
+using q24_8 = fixed<8>;
 
 constexpr int MAX(const int l, const int r){
   if(l > r){
@@ -754,8 +754,8 @@ constexpr bool SAT(const fixed<bl>x, const int lowhigh){
   return(SAT(x, fixed<bl>(-lowhigh), fixed<bl>(-lowhigh)));
 }
 
-const q8_24 PI = 3.14159265359;
-const q8_24 SQRT2 = 1.41421356237;
-const q8_24 SQRT3 = 1.73205080757;
-const q8_24 SQRT2_INV = 0.70710678118;
-const q8_24 SQRT3_INV = 0.57735026919;
+constexpr q8_24 PI = 3.14159265359;
+constexpr q8_24 SQRT2 = 1.41421356237;
+constexpr q8_24 SQRT3 = 1.73205080757;
+constexpr q8_24 SQRT2_INV = 0.70710678118;
+constexpr q8_24 SQRT3_INV = 0.57735026919;
