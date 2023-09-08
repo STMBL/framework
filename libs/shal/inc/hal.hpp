@@ -26,14 +26,14 @@ class hal_t{
       hal_ticks++;
   
       for(uint32_t i = 0; i < funcs; i++){
-        if(comps[hal_slot][i]){
+        if(rt_comps[hal_slot][i]){
           int32_t start_time = *tim_ptr;
-          comps[hal_slot][i]->rt(ctx, hal_slot);
+          rt_comps[hal_slot][i]->rt(ctx, hal_slot);
           int32_t stop_time = *tim_ptr;
           int32_t diff = stop_time - start_time;
           diff = ABS(diff);
-          comps[hal_slot][i]->time = diff;
-          comps[hal_slot][i]->max_time = MAX(comps[hal_slot][i]->max_time, diff);
+          rt_comps[hal_slot][i]->time = diff;
+          rt_comps[hal_slot][i]->max_time = MAX(rt_comps[hal_slot][i]->max_time, diff);
         }
       }
 
@@ -42,12 +42,8 @@ class hal_t{
     }
 
     void run_nrt(){
-      for(uint32_t slot = 0; slot < slots; slot++){
-        for(uint32_t comp = 0; comp < funcs; comp++){
-          if(comps[slot][comp]){
-            comps[slot][comp]->nrt(ctx);
-          }
-        }
+      for(uint32_t comp = 0; comp < comp_cnt; comp++){
+        comps[comp]->nrt(ctx);
       }
     }
 
@@ -55,25 +51,30 @@ class hal_t{
       hal_slot = 0;
       hal_ticks = 0;
 
-      for(uint32_t slot = 0; slot < slots; slot++){
-        for(uint32_t comp = 0; comp < funcs; comp++){
-          if(comps[slot][comp]){
-            comps[slot][comp]->time = 0;
-            comps[slot][comp]->max_time = 0;
-            comps[slot][comp]->init(ctx);
-          }
-        }
+      for(uint32_t comp = 0; comp < comp_cnt; comp++){
+        comps[comp]->time = 0;
+        comps[comp]->max_time = 0;
+        comps[comp]->init(ctx);
       }
     }
 
-    void add_comp(hal_comp* comp, uint32_t slot, uint32_t func){
+    void add_rt_comp(hal_comp* comp, uint32_t slot, uint32_t func){
       if(slot < slots && func < funcs){
-        comps[slot][func] = comp;
+        rt_comps[slot][func] = comp;
+      }
+    }
+
+    void add_comp(hal_comp* comp){
+      if(comp_cnt < slots * funcs){
+        comps[comp_cnt] = comp;
+        comp_cnt++;
       }
     }
 
 
-    hal_comp* comps[slots][funcs];
+    hal_comp* rt_comps[slots][funcs];
+    hal_comp* comps[slots * funcs];
   private:
+    uint32_t comp_cnt = 0;
     uint32_t hal_slot;
 };

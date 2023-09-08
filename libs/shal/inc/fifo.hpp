@@ -48,6 +48,12 @@ class fifo_t{
       temp_read_ptr = read_ptr;
     }
 
+    void clear(){
+      read_ptr = 0;
+      write_ptr = 0;
+      temp_read_ptr = 0; 
+    }
+
     uint32_t free(){ // space left
       return(count - (write_ptr + count - read_ptr) % count);
     }
