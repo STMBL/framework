@@ -69,7 +69,7 @@ for file in sys.argv[2:]:
 
 header = open(sys.argv[1], 'w')
 header.write("#include \"fp_lib.hpp\"\n")
-header.write("#include \"units.hpp\"\n")
+#header.write("#include \"units.hpp\"\n")
 header.write("#include \"fifo.hpp\"\n")
 header.write("#pragma once\n")
 header.write("\n")
