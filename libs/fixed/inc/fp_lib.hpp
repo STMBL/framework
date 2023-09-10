@@ -706,6 +706,21 @@ constexpr q16_16 SCALE(const fixed<bl>x, const fixed<bm>low, const fixed<br>high
   return(r);
 }
 
+template<uint8_t bl>
+constexpr fixed<bl> MINUS(const fixed<bl>a, const fixed<bl>b){
+  fixed<bl> diff = a - b;
+  fixed<bl> max2 = diff.max() / 2;
+  fixed<bl> min2 = diff.min() / 2;
+  
+  if(diff > max2){
+    return(diff - diff.max());
+  }
+  if(diff < min2){
+    return(diff + diff.max());
+  }
+  return(diff);
+}
+
 constexpr auto ABS(auto x){
   if(x < 0){
     return(-x);
